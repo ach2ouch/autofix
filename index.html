@@ -208,21 +208,61 @@
     dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('border-amber-400', 'bg-amber-50/30'); handleFile(e.dataTransfer.files[0]); });
     fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
-    function handleFile(file) {
+    // Compresses an image to keep the AI fast.
+    // Resizes to max 1280px on the longest side, JPEG 80% quality.
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Lecture du fichier impossible'));
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Format image non supporté'));
+          img.onload = () => {
+            const MAX_DIM = 1280;
+            let { width, height } = img;
+            if (width > MAX_DIM || height > MAX_DIM) {
+              if (width > height) {
+                height = Math.round(height * (MAX_DIM / width));
+                width = MAX_DIM;
+              } else {
+                width = Math.round(width * (MAX_DIM / height));
+                height = MAX_DIM;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+            // Output as JPEG to maximize compression (small file = fast AI).
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            resolve({ dataUrl, mediaType: 'image/jpeg', width, height });
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleFile(file) {
       if (!file) return;
       if (!file.type.startsWith('image/')) { showError('Veuillez télécharger une image'); return; }
       hideError();
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imageDataUrl = e.target.result;
-        imageBase64 = imageDataUrl.split(',')[1];
-        imageMediaType = file.type;
-        previewImg.src = imageDataUrl;
+      try {
+        const { dataUrl, mediaType } = await compressImage(file);
+        imageDataUrl = dataUrl;
+        imageBase64 = dataUrl.split(',')[1];
+        imageMediaType = mediaType;
+        previewImg.src = dataUrl;
         heroSection.classList.add('hidden');
         previewSection.classList.remove('hidden');
         resultsSection.classList.add('hidden');
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error(err);
+        showError("Impossible de traiter l'image. Essayez un autre fichier.");
+      }
     }
 
     function reset() {
