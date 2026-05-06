@@ -1,4 +1,4 @@
-// AutoPieces.tn — Buyer/owner side: repair cost analysis
+// AutoPieces.tn — Optimized for speed (avoid 504 timeouts)
 
 exports.handler = async (event) => {
   const headers = {
@@ -18,48 +18,36 @@ exports.handler = async (event) => {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: 'Clé API non configurée sur le serveur' }) };
 
-    const prompt = `Analyse cette photo de véhicule accidenté pour estimer le COÛT DE RÉPARATION pour le propriétaire de la voiture en Tunisie. Réponds UNIQUEMENT en JSON valide (commence par {, termine par }, pas de markdown).
+    // Compact prompt for fastest possible response
+    const prompt = `Analyse photo voiture accidentée. Estimation coût réparation pour propriétaire en Tunisie.
+
+JSON UNIQUEMENT (commence {, finit }, pas markdown, pas texte autour).
 
 Voitures populaires Tunisie: Peugeot 207/208, Renault Clio/Symbol, Citroën C3, Hyundai i10/i20, VW Golf, Dacia Logan.
-Prix TND réalistes pour acheter des pièces (occasion/neuf): petites pièces 30-150 DT, moyennes 100-500 DT, grosses 500-2000 DT.
-Main d'œuvre garage tunisien: 30-50 DT/heure typique, 60-100 DT/h chez concessionnaire.
+Prix TND: petites pièces 30-150, moyennes 100-500, grosses 500-2000. Main d'œuvre garage 30-50 DT/h.
 
-IMPORTANT: Liste 5-6 pièces SEULEMENT à remplacer/réparer. Pour chaque pièce, 2 annonces marché tunisien (Tayara, Automobile.tn, Facebook Marketplace, Affare.tn).
-Pour chaque zone de dégât: position photoX, photoY (0-100%) où elle apparaît dans l'image.
+IMPORTANT: 4-5 pièces SEULEMENT. Descriptions très courtes. 2 annonces par pièce.
 
-JSON exact:
+JSON:
 {
   "vehicleIdentified": {"make":"","model":"","yearRange":"","bodyType":"","color":"","confidence":80},
-  "overallCondition": {"severity":"moderate","severityScore":6,"repairability":"economically_viable","summaryFR":"court"},
+  "overallCondition": {"severity":"moderate","severityScore":6,"repairability":"economically_viable","summaryFR":"très court"},
   "damageZones": [{"zone":"front_center","severity":"severe","descriptionFR":"court","photoX":50,"photoY":50}],
-  "repairCost": {
-    "partsMinTND":1000,
-    "partsMaxTND":1800,
-    "laborHours":12,
-    "laborMinTND":400,
-    "laborMaxTND":800,
-    "totalMinTND":1400,
-    "totalMaxTND":2600,
-    "dealerEstimateTND":4500,
-    "savingsPercent":45
-  },
+  "repairCost": {"partsMinTND":1000,"partsMaxTND":1800,"laborHours":12,"laborMinTND":400,"laborMaxTND":800,"totalMinTND":1400,"totalMaxTND":2600,"dealerEstimateTND":4500,"savingsPercent":45},
   "parts": [
     {
-      "id":"p1","nameFR":"","category":"carrosserie","zone":"front_left","damageType":"choc/rayure/brisé/déformé",
-      "actionRequired":"À remplacer|À réparer|À redresser|À repeindre",
-      "buyPriceMinTND":80,"buyPriceMaxTND":200,
-      "newPriceTND":450,
-      "compatibleWith":["modèle 1","modèle 2"],
-      "notesFR":"court conseil",
+      "id":"p1","nameFR":"","category":"carrosserie","zone":"front_left","damageType":"choc",
+      "actionRequired":"À remplacer","buyPriceMinTND":80,"buyPriceMaxTND":200,"newPriceTND":450,
+      "compatibleWith":["m1","m2"],"notesFR":"court",
       "marketListings":[
-        {"site":"Tayara","title":"court","priceTND":120,"location":"Tunis","condition":"Bon état","sellerType":"Particulier"},
+        {"site":"Tayara","title":"court","priceTND":120,"location":"Tunis","condition":"Bon","sellerType":"Particulier"},
         {"site":"Automobile.tn","title":"court","priceTND":150,"location":"Sousse","condition":"Très bon","sellerType":"Casse auto"}
       ]
     }
   ],
   "repairTimeDays": {"min":3,"max":7},
   "garageRecommendations": [
-    {"type":"Carrossier indépendant","priceLevel":"économique","estimatedTND":1400,"description":"court"},
+    {"type":"Carrossier","priceLevel":"économique","estimatedTND":1400,"description":"court"},
     {"type":"Garage agréé","priceLevel":"moyen","estimatedTND":2200,"description":"court"},
     {"type":"Concessionnaire","priceLevel":"premium","estimatedTND":4500,"description":"court"}
   ],
@@ -67,19 +55,20 @@ JSON exact:
 }
 
 zones: front_left|front_center|front_right|left_side|right_side|rear_left|rear_center|rear_right|hood|roof|trunk|windshield_front|windshield_rear|underbody
-severity overall: minor|moderate|severe|total_loss
-severity zones: none|minor|moderate|severe
+overall severity: minor|moderate|severe|total_loss
+zones severity: none|minor|moderate|severe
 repairability: economically_viable|costly_but_possible|not_economically_viable|total_loss
 category: carrosserie|mécanique|électrique|intérieur|vitrage|éclairage|roues|autre
+actionRequired: À remplacer|À réparer|À redresser|À repeindre
 priceLevel: économique|moyen|premium
 site: Tayara|Automobile.tn|Facebook Marketplace|Affare.tn
 sellerType: Particulier|Casse auto|Professionnel
 location: ville tunisienne
 
-Pas une voiture? {"error":"texte"}`;
+Pas voiture? {"error":"texte court"}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 24000);
+    const timeoutId = setTimeout(() => controller.abort(), 23000);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -90,8 +79,8 @@ Pas une voiture? {"error":"texte"}`;
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 5000,
+        model: 'claude-haiku-4-5', // Haiku is fastest
+        max_tokens: 4000,
         messages: [
           {
             role: 'user',
@@ -114,7 +103,7 @@ Pas une voiture? {"error":"texte"}`;
 
     const data = await response.json();
     let rawText = data.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-    console.log('=== Raw response length:', rawText.length, '===');
+    console.log('=== Response length:', rawText.length, '===');
 
     const tryParse = (str) => { try { return JSON.parse(str); } catch (e) { return null; } };
 
@@ -142,7 +131,6 @@ Pas une voiture? {"error":"texte"}`;
       const lastCompleteArr = salvage.lastIndexOf('],');
       const cutPoint = Math.max(lastCompleteObj, lastCompleteArr);
       if (cutPoint > 0) salvage = salvage.substring(0, cutPoint + 1);
-
       let openBrace = 0, openBracket = 0, inString = false, escapeNext = false;
       for (let i = 0; i < salvage.length; i++) {
         const c = salvage[i];
@@ -166,11 +154,10 @@ Pas une voiture? {"error":"texte"}`;
       return { statusCode: 200, headers, body: JSON.stringify(parsed) };
     }
 
-    console.error('Parse failed. Last 300:', rawText.substring(Math.max(0, rawText.length - 300)));
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Format IA invalide. Réessayez avec une autre photo." })
+      body: JSON.stringify({ error: "Format IA invalide. Réessayez." })
     };
 
   } catch (err) {
@@ -178,7 +165,7 @@ Pas une voiture? {"error":"texte"}`;
       return {
         statusCode: 504,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Timeout. Réessayez.' })
+        body: JSON.stringify({ error: "L'analyse a pris trop de temps. Réessayez — la deuxième tentative est souvent plus rapide." })
       };
     }
     console.error('Function error:', err);
