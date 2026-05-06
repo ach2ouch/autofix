@@ -1,4 +1,4 @@
-// AutoPieces.tn — Robust JSON parsing + Sonnet for reliability
+// AutoPieces.tn — Optimized for speed and reliability
 
 exports.handler = async (event) => {
   const headers = {
@@ -18,39 +18,37 @@ exports.handler = async (event) => {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: 'Clé API non configurée sur le serveur' }) };
 
-    const prompt = `Tu es expert en pièces auto pour le marché tunisien (casse auto). Analyse cette photo de véhicule.
+    const prompt = `Analyse cette photo de véhicule pour casse auto en Tunisie.
 
-IMPORTANT: Réponds UNIQUEMENT avec du JSON valide. Pas de texte avant. Pas de texte après. Pas de markdown. Pas de \`\`\`. Commence directement par { et termine par }.
+Réponds UNIQUEMENT en JSON valide, commence par { et termine par }. Pas de markdown, pas de texte autour.
 
-Voitures populaires en Tunisie: Peugeot 207/208/301, Renault Clio/Symbol/Megane, Citroën C-Elysée/C3, Hyundai i10/i20/Accent, Kia Picanto/Rio, VW Golf/Polo, Fiat Punto, Dacia Logan/Sandero.
+Voitures populaires en Tunisie: Peugeot 207/208, Renault Clio/Symbol, Citroën C3, Hyundai i10/i20, Kia Picanto, VW Golf, Dacia Logan.
 
-Prix en TND (Dinars Tunisiens). RÉALISTE: petites pièces 30-150 DT, moyennes 100-500 DT, grosses 500-2000 DT.
+Prix réalistes en TND: petites pièces 30-150 DT, moyennes 100-500 DT, grosses 500-2000 DT. Liste 8-10 pièces principales.
 
-Liste 8-12 pièces avec valeur de revente. Pour chaque pièce: 2-3 modèles compatibles en Tunisie.
-
-Structure JSON exacte (respecte tous les champs):
+Format JSON exact:
 {
-  "vehicleIdentified": {"make":"Peugeot","model":"207","yearRange":"2006-2014","bodyType":"berline","color":"blanc","confidence":85},
-  "overallCondition": {"severity":"severe","severityScore":7,"salvageRating":"good","summaryFR":"Choc frontal important..."},
-  "damageZones": [{"zone":"front_center","severity":"severe","descriptionFR":"Pare-chocs détruit"}],
-  "earnings": {"totalMinTND":2500,"totalMaxTND":4200,"wholeCarValueTND":1500,"potentialUpliftPercent":80},
-  "parts": [{"id":"p1","nameFR":"Phare avant gauche","category":"éclairage","zone":"front_left","condition":"Bon","salvageable":true,"priceMinTND":120,"priceMaxTND":200,"demandLevel":"élevée","compatibleWith":["Peugeot 208 (2012-2019)","Citroën C3"],"notesFR":"Optique intact"}],
-  "highDemandParts": ["Moteur","Boîte de vitesses","Phares"],
-  "sellingTipsFR": ["Conseil 1","Conseil 2","Conseil 3"]
+  "vehicleIdentified": {"make":"","model":"","yearRange":"","bodyType":"","color":"","confidence":85},
+  "overallCondition": {"severity":"moderate","severityScore":6,"salvageRating":"good","summaryFR":""},
+  "damageZones": [{"zone":"front_center","severity":"severe","descriptionFR":""}],
+  "earnings": {"totalMinTND":0,"totalMaxTND":0,"wholeCarValueTND":0,"potentialUpliftPercent":0},
+  "parts": [{"id":"p1","nameFR":"","category":"carrosserie","zone":"front_left","condition":"Bon","salvageable":true,"priceMinTND":0,"priceMaxTND":0,"demandLevel":"élevée","compatibleWith":["",""],"notesFR":""}],
+  "highDemandParts": ["",""],
+  "sellingTipsFR": ["",""]
 }
 
-Valeurs autorisées:
-- damageZones.zone: front_left, front_center, front_right, left_side, right_side, rear_left, rear_center, rear_right, hood, roof, trunk, windshield_front, windshield_rear, underbody
-- damageZones.severity et overallCondition.severity: minor, moderate, severe, total_loss (pour overallCondition) ou none, minor, moderate, severe (pour zones)
-- salvageRating: excellent, good, fair, poor
-- parts.category: carrosserie, mécanique, électrique, intérieur, vitrage, éclairage, roues, autre
-- parts.condition: Neuf, Bon, Moyen, Endommagé, Pour pièces
-- parts.demandLevel: très élevée, élevée, moyenne, faible
+Valeurs zone: front_left, front_center, front_right, left_side, right_side, rear_left, rear_center, rear_right, hood, roof, trunk, windshield_front, windshield_rear, underbody
+Valeurs severity (overallCondition): minor, moderate, severe, total_loss
+Valeurs severity (zones): none, minor, moderate, severe
+Valeurs salvageRating: excellent, good, fair, poor
+Valeurs category: carrosserie, mécanique, électrique, intérieur, vitrage, éclairage, roues, autre
+Valeurs condition: Neuf, Bon, Moyen, Endommagé, Pour pièces
+Valeurs demandLevel: très élevée, élevée, moyenne, faible
 
-Si pas une voiture: {"error":"Cette image ne montre pas un véhicule"}`;
+Pas une voiture? Retourne: {"error":"explication courte"}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    const timeoutId = setTimeout(() => controller.abort(), 24000);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -62,7 +60,7 @@ Si pas une voiture: {"error":"Cette image ne montre pas un véhicule"}`;
       signal: controller.signal,
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 3500,
+        max_tokens: 3000,
         messages: [
           {
             role: 'user',
@@ -86,45 +84,22 @@ Si pas une voiture: {"error":"Cette image ne montre pas un véhicule"}`;
     const data = await response.json();
     let rawText = data.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
 
-    console.log('Raw AI response length:', rawText.length);
-    console.log('First 200 chars:', rawText.substring(0, 200));
+    console.log('Raw response length:', rawText.length);
 
-    // ROBUST JSON EXTRACTION
-    // Strategy: try multiple cleanup approaches in order
-    const tryParse = (str) => {
-      try { return JSON.parse(str); } catch (e) { return null; }
-    };
+    const tryParse = (str) => { try { return JSON.parse(str); } catch (e) { return null; } };
 
-    let parsed = null;
-
-    // Attempt 1: parse as-is
-    parsed = tryParse(rawText.trim());
-
-    // Attempt 2: remove markdown code fences
+    let parsed = tryParse(rawText.trim());
+    if (!parsed) parsed = tryParse(rawText.replace(/```json/gi, '').replace(/```/g, '').trim());
     if (!parsed) {
-      const cleaned = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-      parsed = tryParse(cleaned);
+      const first = rawText.indexOf('{');
+      const last = rawText.lastIndexOf('}');
+      if (first !== -1 && last > first) parsed = tryParse(rawText.substring(first, last + 1));
     }
-
-    // Attempt 3: extract everything between first { and last }
-    if (!parsed) {
-      const firstBrace = rawText.indexOf('{');
-      const lastBrace = rawText.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        const extracted = rawText.substring(firstBrace, lastBrace + 1);
-        parsed = tryParse(extracted);
-      }
-    }
-
-    // Attempt 4: try to fix common JSON errors (trailing commas, single quotes)
     if (!parsed) {
       let fixed = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-      const firstBrace = fixed.indexOf('{');
-      const lastBrace = fixed.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        fixed = fixed.substring(firstBrace, lastBrace + 1);
-      }
-      // Remove trailing commas before closing brackets
+      const first = fixed.indexOf('{');
+      const last = fixed.lastIndexOf('}');
+      if (first !== -1 && last > first) fixed = fixed.substring(first, last + 1);
       fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
       parsed = tryParse(fixed);
     }
@@ -133,17 +108,11 @@ Si pas une voiture: {"error":"Cette image ne montre pas un véhicule"}`;
       return { statusCode: 200, headers, body: JSON.stringify(parsed) };
     }
 
-    // All parsing attempts failed - log full response for debugging
-    console.error('All parse attempts failed. Full raw response:');
-    console.error(rawText);
-
+    console.error('Parse failed. Raw:', rawText.substring(0, 500));
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({
-        error: "L'IA n'a pas retourné un format valide. Réessayez ou utilisez une image plus claire.",
-        debug: rawText.substring(0, 300)
-      })
+      body: JSON.stringify({ error: "L'IA n'a pas retourné un format valide. Réessayez." })
     };
 
   } catch (err) {
@@ -151,7 +120,7 @@ Si pas une voiture: {"error":"Cette image ne montre pas un véhicule"}`;
       return {
         statusCode: 504,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Analyse trop longue. Essayez avec une image plus petite.' })
+        body: JSON.stringify({ error: 'Analyse trop longue. Image trop complexe ou serveur lent — réessayez.' })
       };
     }
     console.error('Function error:', err);
