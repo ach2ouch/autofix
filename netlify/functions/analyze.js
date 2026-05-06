@@ -1,4 +1,4 @@
-// AutoPieces.tn — Optimized for speed and reliability
+// AutoPieces.tn — Fast version using Haiku to avoid Netlify timeout
 
 exports.handler = async (event) => {
   const headers = {
@@ -18,34 +18,33 @@ exports.handler = async (event) => {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: 'Clé API non configurée sur le serveur' }) };
 
-    const prompt = `Analyse cette photo de véhicule pour casse auto en Tunisie.
+    // Compact prompt - faster generation
+    const prompt = `Analyse cette photo de véhicule accidenté pour casse auto en Tunisie. Réponds UNIQUEMENT en JSON valide (commence par {, termine par }, pas de markdown).
 
-Réponds UNIQUEMENT en JSON valide, commence par { et termine par }. Pas de markdown, pas de texte autour.
+Voitures populaires Tunisie: Peugeot 207/208, Renault Clio/Symbol, Citroën C3, Hyundai i10/i20, VW Golf, Dacia Logan.
+Prix TND réalistes: petites pièces 30-150 DT, moyennes 100-500 DT, grosses 500-2000 DT.
+Liste 6-8 pièces principales (pas plus).
 
-Voitures populaires en Tunisie: Peugeot 207/208, Renault Clio/Symbol, Citroën C3, Hyundai i10/i20, Kia Picanto, VW Golf, Dacia Logan.
-
-Prix réalistes en TND: petites pièces 30-150 DT, moyennes 100-500 DT, grosses 500-2000 DT. Liste 8-10 pièces principales.
-
-Format JSON exact:
+JSON exact:
 {
-  "vehicleIdentified": {"make":"","model":"","yearRange":"","bodyType":"","color":"","confidence":85},
-  "overallCondition": {"severity":"moderate","severityScore":6,"salvageRating":"good","summaryFR":""},
-  "damageZones": [{"zone":"front_center","severity":"severe","descriptionFR":""}],
-  "earnings": {"totalMinTND":0,"totalMaxTND":0,"wholeCarValueTND":0,"potentialUpliftPercent":0},
-  "parts": [{"id":"p1","nameFR":"","category":"carrosserie","zone":"front_left","condition":"Bon","salvageable":true,"priceMinTND":0,"priceMaxTND":0,"demandLevel":"élevée","compatibleWith":["",""],"notesFR":""}],
-  "highDemandParts": ["",""],
-  "sellingTipsFR": ["",""]
+  "vehicleIdentified": {"make":"","model":"","yearRange":"","bodyType":"","color":"","confidence":80},
+  "overallCondition": {"severity":"moderate","severityScore":6,"salvageRating":"good","summaryFR":"résumé court"},
+  "damageZones": [{"zone":"front_center","severity":"severe","descriptionFR":"court"}],
+  "earnings": {"totalMinTND":2000,"totalMaxTND":3500,"wholeCarValueTND":1500,"potentialUpliftPercent":50},
+  "parts": [{"id":"p1","nameFR":"","category":"carrosserie","zone":"front_left","condition":"Bon","salvageable":true,"priceMinTND":100,"priceMaxTND":250,"demandLevel":"élevée","compatibleWith":["modèle 1","modèle 2"],"notesFR":"court"}],
+  "highDemandParts": ["pièce1","pièce2","pièce3"],
+  "sellingTipsFR": ["conseil1","conseil2","conseil3"]
 }
 
-Valeurs zone: front_left, front_center, front_right, left_side, right_side, rear_left, rear_center, rear_right, hood, roof, trunk, windshield_front, windshield_rear, underbody
-Valeurs severity (overallCondition): minor, moderate, severe, total_loss
-Valeurs severity (zones): none, minor, moderate, severe
-Valeurs salvageRating: excellent, good, fair, poor
-Valeurs category: carrosserie, mécanique, électrique, intérieur, vitrage, éclairage, roues, autre
-Valeurs condition: Neuf, Bon, Moyen, Endommagé, Pour pièces
-Valeurs demandLevel: très élevée, élevée, moyenne, faible
+zones: front_left|front_center|front_right|left_side|right_side|rear_left|rear_center|rear_right|hood|roof|trunk|windshield_front|windshield_rear|underbody
+overallCondition.severity: minor|moderate|severe|total_loss
+zones severity: none|minor|moderate|severe
+salvageRating: excellent|good|fair|poor
+category: carrosserie|mécanique|électrique|intérieur|vitrage|éclairage|roues|autre
+condition: Neuf|Bon|Moyen|Endommagé|Pour pièces
+demandLevel: très élevée|élevée|moyenne|faible
 
-Pas une voiture? Retourne: {"error":"explication courte"}`;
+Pas une voiture? {"error":"texte"}`;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 24000);
@@ -59,8 +58,9 @@ Pas une voiture? Retourne: {"error":"explication courte"}`;
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 3000,
+        // Haiku is ~5x faster than Sonnet, perfect for this use case
+        model: 'claude-haiku-4-5',
+        max_tokens: 2000,
         messages: [
           {
             role: 'user',
@@ -83,8 +83,7 @@ Pas une voiture? Retourne: {"error":"explication courte"}`;
 
     const data = await response.json();
     let rawText = data.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-
-    console.log('Raw response length:', rawText.length);
+    console.log('Response length:', rawText.length);
 
     const tryParse = (str) => { try { return JSON.parse(str); } catch (e) { return null; } };
 
@@ -112,7 +111,7 @@ Pas une voiture? Retourne: {"error":"explication courte"}`;
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "L'IA n'a pas retourné un format valide. Réessayez." })
+      body: JSON.stringify({ error: "Format IA invalide. Réessayez." })
     };
 
   } catch (err) {
@@ -120,7 +119,7 @@ Pas une voiture? Retourne: {"error":"explication courte"}`;
       return {
         statusCode: 504,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Analyse trop longue. Image trop complexe ou serveur lent — réessayez.' })
+        body: JSON.stringify({ error: 'Timeout. Réessayez avec une autre image.' })
       };
     }
     console.error('Function error:', err);
