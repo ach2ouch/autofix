@@ -11,34 +11,235 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
     .font-serif { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
-    .fade-in { animation: fadeIn 0.6s ease-out; }
+
+    /* ---------- BASIC ANIMATIONS ---------- */
+    .fade-in { animation: fadeIn 0.6s ease-out both; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Stagger children */
+    .stagger > * { animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; opacity: 0; }
+    .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+    .stagger > *:nth-child(2) { animation-delay: 0.15s; }
+    .stagger > *:nth-child(3) { animation-delay: 0.25s; }
+    .stagger > *:nth-child(4) { animation-delay: 0.35s; }
+    .stagger > *:nth-child(5) { animation-delay: 0.45s; }
+    .stagger > *:nth-child(6) { animation-delay: 0.55s; }
+    .stagger > *:nth-child(7) { animation-delay: 0.65s; }
+    .stagger > *:nth-child(8) { animation-delay: 0.75s; }
+    .stagger > *:nth-child(9) { animation-delay: 0.85s; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Damage markers - blip in one by one */
+    .photo-marker { animation: markerBlip 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    @keyframes markerBlip {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+      60% { transform: translate(-50%, -50%) scale(1.4); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* ---------- SCAN ANIMATION (during loading) ---------- */
+    .scan-overlay { background: rgba(0, 0, 0, 0.05); }
     .scan-line {
-      background: linear-gradient(90deg, transparent, rgba(180, 83, 9, 0.6), transparent);
-      animation: scanMove 2s ease-in-out infinite;
+      position: absolute;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, #fbbf24 30%, #fff 50%, #fbbf24 70%, transparent 100%);
+      box-shadow: 0 0 24px 8px rgba(251, 191, 36, 0.6);
+      animation: scanSweep 2.5s ease-in-out infinite;
     }
-    @keyframes scanMove {
-      0%, 100% { top: 0%; opacity: 0; }
-      50% { top: 100%; opacity: 1; }
+    @keyframes scanSweep {
+      0% { top: 0%; opacity: 0; }
+      8% { opacity: 1; }
+      92% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
     }
+
+    /* Vertical scan line */
+    .scan-line-v {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, #fbbf24, transparent);
+      box-shadow: 0 0 16px 4px rgba(251, 191, 36, 0.5);
+      animation: scanSweepV 3s ease-in-out infinite;
+      animation-delay: 0.5s;
+    }
+    @keyframes scanSweepV {
+      0% { left: 0%; opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { left: 100%; opacity: 0; }
+    }
+
+    /* Corner brackets - HUD style */
+    .hud-corner {
+      position: absolute;
+      width: 28px; height: 28px;
+      border: 2px solid #fbbf24;
+      animation: hudPulse 1.5s ease-in-out infinite;
+    }
+    .hud-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+    .hud-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+    .hud-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+    .hud-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+    @keyframes hudPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; box-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
+    }
+
+    /* Targeting reticle that bounces around the photo */
+    .reticle {
+      position: absolute;
+      width: 60px; height: 60px;
+      border: 2px solid #fbbf24;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), inset 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+    .reticle::before, .reticle::after {
+      content: ''; position: absolute; background: #fbbf24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+    }
+    .reticle::before { top: 50%; left: -10px; right: -10px; height: 1.5px; transform: translateY(-50%); }
+    .reticle::after { left: 50%; top: -10px; bottom: -10px; width: 1.5px; transform: translateX(-50%); }
+    .reticle-inner {
+      position: absolute; inset: 14px;
+      border: 1.5px solid rgba(251, 191, 36, 0.7);
+      border-radius: 50%;
+      animation: reticleSpin 2s linear infinite;
+    }
+    @keyframes reticleSpin {
+      0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
+      50% { transform: rotate(180deg) scale(0.8); opacity: 1; }
+      100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
+    }
+
+    /* Particle dots around photo */
+    .particle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: #fbbf24;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #fbbf24;
+      animation: particleFloat 3s ease-in-out infinite;
+    }
+    @keyframes particleFloat {
+      0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+      50% { opacity: 1; transform: translateY(-20px) scale(1); }
+    }
+
+    /* Glowing aura around photo when loading */
+    .photo-aura {
+      animation: photoGlow 2s ease-in-out infinite;
+    }
+    @keyframes photoGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.15); }
+      50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 80px rgba(251, 191, 36, 0.3); }
+    }
+
+    /* Loading status step animations */
+    .loading-step {
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .loading-step.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .loading-step.done .step-icon-loading { display: none; }
+    .loading-step.done .step-icon-done { display: inline-flex; }
+    .loading-step:not(.done) .step-icon-done { display: none; }
+    .step-icon-loading { display: inline-flex; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(251, 191, 36, 0.2);
+      border-top-color: #fbbf24;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Shimmer for percent counter */
+    .shimmer {
+      background: linear-gradient(90deg, #fbbf24 0%, #fff 50%, #fbbf24 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerSlide 2s linear infinite;
+    }
+    @keyframes shimmerSlide {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Counter animation - numbers that "tick up" */
+    .count-up {
+      animation: countPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes countPop {
+      0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Car zone interactions */
     .car-zone {
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.2s;
+      transition: opacity 0.2s, transform 0.2s, filter 0.2s;
     }
-    .car-zone:hover {
-      opacity: 0.85;
-    }
+    .car-zone:hover { opacity: 0.85; }
     .car-zone.active {
       opacity: 1;
-      filter: drop-shadow(0 0 8px currentColor);
+      filter: drop-shadow(0 0 10px currentColor);
     }
+
     .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
     @keyframes pulseDot {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* Typewriter text effect */
+    .typewriter {
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 1.2s steps(40, end) both;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    /* Hero gradient pulse */
+    .hero-pulse-bg {
+      background: radial-gradient(circle at 30% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(52, 211, 153, 0.08) 0%, transparent 50%);
+      animation: heroPulse 8s ease-in-out infinite;
+    }
+    @keyframes heroPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Number tick effect */
+    .tick-number {
+      display: inline-block;
+      animation: tickIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes tickIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -125,33 +326,144 @@
     <!-- PREVIEW + ANALYZE -->
     <div id="preview-section" class="hidden fade-in grid md:grid-cols-2 gap-10 items-start">
       <div class="relative">
-        <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Votre photo</div>
-        <div class="relative bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
-          <img id="preview-img" alt="Véhicule" class="w-full h-auto" />
-          <button id="reset-btn-preview" class="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur border border-stone-200 hover:border-stone-400 rounded-full flex items-center justify-center transition-colors shadow-sm">
+        <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4 flex items-center gap-2">
+          <span>Votre photo</span>
+          <span id="scan-status-pill" class="hidden inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px] tracking-wider font-medium">
+            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+            ANALYSE EN COURS
+          </span>
+        </div>
+        <div id="photo-frame" class="relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 shadow-sm transition-all">
+          <img id="preview-img" alt="Véhicule" class="w-full h-auto transition-all duration-700" />
+          <button id="reset-btn-preview" class="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur border border-stone-200 hover:border-stone-400 rounded-full flex items-center justify-center transition-colors shadow-sm z-30">
             <svg class="w-4 h-4 text-stone-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
-          <div id="scan-overlay" class="hidden absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute left-0 right-0 h-px scan-line"></div>
+
+          <!-- CINEMATIC SCAN OVERLAY -->
+          <div id="scan-overlay" class="hidden absolute inset-0 overflow-hidden pointer-events-none z-20">
+            <!-- Dark tint -->
+            <div class="absolute inset-0 bg-stone-900/30"></div>
+            <!-- HUD corners -->
+            <div class="hud-corner tl"></div>
+            <div class="hud-corner tr"></div>
+            <div class="hud-corner bl"></div>
+            <div class="hud-corner br"></div>
+            <!-- Horizontal scan line -->
+            <div class="scan-line"></div>
+            <!-- Vertical scan line -->
+            <div class="scan-line-v"></div>
+            <!-- Targeting reticle (moves around photo) -->
+            <div id="reticle" class="reticle hidden">
+              <div class="reticle-inner"></div>
+            </div>
+            <!-- Floating particles -->
+            <div class="particle" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
+            <div class="particle" style="top: 70%; left: 80%; animation-delay: 0.5s;"></div>
+            <div class="particle" style="top: 40%; left: 50%; animation-delay: 1s;"></div>
+            <div class="particle" style="top: 85%; left: 30%; animation-delay: 1.5s;"></div>
+            <div class="particle" style="top: 30%; left: 90%; animation-delay: 2s;"></div>
+            <div class="particle" style="top: 60%; left: 10%; animation-delay: 2.5s;"></div>
+            <!-- Live text overlay (typewriter style) -->
+            <div class="absolute bottom-4 left-4 right-4 z-10">
+              <div class="bg-stone-900/80 backdrop-blur border border-amber-400/30 rounded-xl px-4 py-2.5 flex items-center gap-3 text-amber-100 text-xs">
+                <div class="spinner"></div>
+                <div id="scan-status-text" class="font-mono tracking-wide flex-1 truncate">Initialisation du scanner...</div>
+                <div id="scan-progress-pct" class="text-amber-400 font-bold tabular-nums">0%</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="md:sticky md:top-28">
-        <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Prêt à analyser</div>
-        <div class="bg-white rounded-2xl border border-stone-200 p-8 shadow-sm">
-          <h3 class="font-serif text-3xl font-light text-stone-900 mb-3">Voyons les dégâts de plus près.</h3>
-          <p class="text-stone-600 leading-relaxed mb-8">L'IA va identifier votre voiture, analyser chaque dégât, calculer le coût total de réparation, et vous montrer où acheter les pièces aux meilleurs prix.</p>
-          <div class="space-y-3 mb-8">
-            <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Identification du véhicule et des dégâts</span></div>
-            <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Liste des pièces à remplacer ou réparer</span></div>
-            <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Coût total : pièces + main d'œuvre</span></div>
-            <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Annonces en direct au meilleur prix</span></div>
+        <!-- Default state: ready to analyze -->
+        <div id="ready-panel">
+          <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Prêt à analyser</div>
+          <div class="bg-white rounded-2xl border border-stone-200 p-8 shadow-sm">
+            <h3 class="font-serif text-3xl font-light text-stone-900 mb-3">Voyons les dégâts de plus près.</h3>
+            <p class="text-stone-600 leading-relaxed mb-8">L'IA va identifier votre voiture, analyser chaque dégât, calculer le coût total de réparation, et vous montrer où acheter les pièces aux meilleurs prix.</p>
+            <div class="space-y-3 mb-8">
+              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Identification du véhicule et des dégâts</span></div>
+              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Liste des pièces à remplacer ou réparer</span></div>
+              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Coût total : pièces + main d'œuvre</span></div>
+              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Annonces en direct au meilleur prix</span></div>
+            </div>
+            <button id="analyze-btn" class="w-full bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-stone-50 font-medium py-4 rounded-full transition-all flex items-center justify-center gap-2 hover:gap-3 hover:scale-[1.02]">
+              <span id="analyze-btn-text">Lancer l'analyse IA</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </button>
           </div>
-          <button id="analyze-btn" class="w-full bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-stone-50 font-medium py-4 rounded-full transition-colors flex items-center justify-center gap-2">
-            <span id="analyze-btn-text">Estimer la réparation</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          </button>
+        </div>
+
+        <!-- Loading state: live AI analysis steps -->
+        <div id="loading-panel" class="hidden">
+          <div class="text-xs tracking-[0.15em] uppercase text-amber-700 mb-4 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+            Analyse IA en direct
+          </div>
+          <div class="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl border border-amber-400/20 p-8 shadow-2xl text-stone-50 relative overflow-hidden">
+            <!-- Animated background glow -->
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+
+            <div class="relative">
+              <h3 class="font-serif text-2xl md:text-3xl font-light mb-2">
+                <span class="shimmer">Analyse en cours...</span>
+              </h3>
+              <p class="text-stone-400 text-sm mb-8">L'IA examine votre photo en détail</p>
+
+              <!-- Loading steps - they activate one by one -->
+              <div class="space-y-3.5 mb-8" id="loading-steps">
+                <div class="loading-step flex items-center gap-3 text-sm" data-step="1">
+                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="step-icon-loading"><div class="spinner"></div></span>
+                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                  </div>
+                  <span class="step-text font-mono tracking-wide">Identification du véhicule</span>
+                </div>
+                <div class="loading-step flex items-center gap-3 text-sm" data-step="2">
+                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="step-icon-loading"><div class="spinner"></div></span>
+                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                  </div>
+                  <span class="step-text font-mono tracking-wide">Cartographie des zones de dégâts</span>
+                </div>
+                <div class="loading-step flex items-center gap-3 text-sm" data-step="3">
+                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="step-icon-loading"><div class="spinner"></div></span>
+                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                  </div>
+                  <span class="step-text font-mono tracking-wide">Détection des pièces affectées</span>
+                </div>
+                <div class="loading-step flex items-center gap-3 text-sm" data-step="4">
+                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="step-icon-loading"><div class="spinner"></div></span>
+                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                  </div>
+                  <span class="step-text font-mono tracking-wide">Calcul du coût de réparation</span>
+                </div>
+                <div class="loading-step flex items-center gap-3 text-sm" data-step="5">
+                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="step-icon-loading"><div class="spinner"></div></span>
+                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                  </div>
+                  <span class="step-text font-mono tracking-wide">Recherche des annonces en direct</span>
+                </div>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="space-y-2">
+                <div class="flex items-baseline justify-between text-xs">
+                  <span class="text-stone-400 tracking-wide">Progression</span>
+                  <span id="progress-text" class="text-amber-400 font-mono tabular-nums">0%</span>
+                </div>
+                <div class="h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                  <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                </div>
+                <div id="time-elapsed" class="text-[10px] text-stone-500 font-mono">Temps écoulé : 0.0s</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -166,7 +478,7 @@
     </div>
 
     <!-- RESULTS -->
-    <div id="results-section" class="hidden fade-in space-y-10"></div>
+    <div id="results-section" class="hidden fade-in space-y-10 stagger"></div>
   </main>
 
   <footer class="border-t border-stone-200 mt-24">
@@ -273,13 +585,175 @@
     function showError(msg) { errorText.textContent = msg; errorBox.classList.remove('hidden'); }
     function hideError() { errorBox.classList.add('hidden'); }
 
+    // ================ CINEMATIC LOADING ORCHESTRATION ================
+    let loadingAnimations = []; // track to cancel on completion
+    let scanStartTime = 0;
+
+    const SCAN_MESSAGES = [
+      "Initialisation du scanner IA...",
+      "Calibration de la vision artificielle...",
+      "Identification de la marque et du modèle...",
+      "Détection des contours du véhicule...",
+      "Cartographie de la zone avant...",
+      "Cartographie des côtés...",
+      "Cartographie de la zone arrière...",
+      "Analyse des points d'impact...",
+      "Évaluation de la sévérité des dégâts...",
+      "Identification des pièces affectées...",
+      "Recherche dans la base de données pièces...",
+      "Calcul des prix sur le marché tunisien...",
+      "Estimation du temps de réparation...",
+      "Calcul de la main d'œuvre...",
+      "Recherche d'annonces sur Tayara...",
+      "Recherche d'annonces sur Automobile.tn...",
+      "Comparaison des prix garages...",
+      "Génération du rapport final...",
+      "Vérification des compatibilités...",
+      "Finalisation de l'estimation..."
+    ];
+
+    function startCinematicLoading() {
+      scanStartTime = Date.now();
+
+      // Show scan overlay & status pill
+      scanOverlay.classList.remove('hidden');
+      const pill = document.getElementById('scan-status-pill');
+      if (pill) pill.classList.remove('hidden');
+
+      // Swap panels: hide ready, show loading
+      document.getElementById('ready-panel').classList.add('hidden');
+      document.getElementById('loading-panel').classList.remove('hidden');
+
+      // Reset all loading steps
+      document.querySelectorAll('.loading-step').forEach(s => {
+        s.classList.remove('active', 'done');
+      });
+
+      // ========= 1. Activate steps progressively =========
+      const totalSteps = 5;
+      const stepActivationTime = 800; // ms between step activations
+      for (let i = 0; i < totalSteps; i++) {
+        const t = setTimeout(() => {
+          const step = document.querySelector(`.loading-step[data-step="${i + 1}"]`);
+          if (step) step.classList.add('active');
+        }, i * stepActivationTime);
+        loadingAnimations.push(t);
+      }
+
+      // Mark steps as done over time (visual progress as analysis happens)
+      // We'll mark them done one by one - last one done by completion
+      for (let i = 0; i < totalSteps; i++) {
+        const t = setTimeout(() => {
+          const step = document.querySelector(`.loading-step[data-step="${i + 1}"]`);
+          if (step) step.classList.add('done');
+        }, 1500 + i * 1800);
+        loadingAnimations.push(t);
+      }
+
+      // ========= 2. Cycle through scan status messages =========
+      const scanText = document.getElementById('scan-status-text');
+      let msgIndex = 0;
+      const cycleMessages = () => {
+        if (scanText) scanText.textContent = SCAN_MESSAGES[msgIndex % SCAN_MESSAGES.length];
+        msgIndex++;
+      };
+      cycleMessages();
+      const msgInterval = setInterval(cycleMessages, 1100);
+      loadingAnimations.push(msgInterval);
+
+      // ========= 3. Move targeting reticle around photo =========
+      const reticle = document.getElementById('reticle');
+      if (reticle) {
+        reticle.classList.remove('hidden');
+        const positions = [
+          { x: 25, y: 30 }, { x: 75, y: 35 }, { x: 50, y: 60 },
+          { x: 30, y: 75 }, { x: 80, y: 70 }, { x: 50, y: 25 },
+          { x: 20, y: 50 }, { x: 70, y: 80 }, { x: 60, y: 40 },
+        ];
+        let posIndex = 0;
+        const moveReticle = () => {
+          const p = positions[posIndex % positions.length];
+          reticle.style.left = p.x + '%';
+          reticle.style.top = p.y + '%';
+          posIndex++;
+        };
+        moveReticle();
+        const reticleInterval = setInterval(moveReticle, 900);
+        loadingAnimations.push(reticleInterval);
+      }
+
+      // ========= 4. Animate progress bar (0% to ~85%) =========
+      // Smoothly progress over expected ~10s, plateaus near end so it doesn't finish before API returns
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const scanProgressPct = document.getElementById('scan-progress-pct');
+      let pct = 0;
+      const progressInterval = setInterval(() => {
+        // Asymptotic curve - slows down as it approaches 85%
+        const target = 85;
+        pct += (target - pct) * 0.02;
+        if (pct >= target - 0.1) pct = target;
+        const display = Math.round(pct);
+        if (progressBar) progressBar.style.width = display + '%';
+        if (progressText) progressText.textContent = display + '%';
+        if (scanProgressPct) scanProgressPct.textContent = display + '%';
+      }, 100);
+      loadingAnimations.push(progressInterval);
+
+      // ========= 5. Time elapsed counter =========
+      const timeEl = document.getElementById('time-elapsed');
+      const timeInterval = setInterval(() => {
+        if (timeEl) {
+          const elapsed = ((Date.now() - scanStartTime) / 1000).toFixed(1);
+          timeEl.textContent = `Temps écoulé : ${elapsed}s`;
+        }
+      }, 100);
+      loadingAnimations.push(timeInterval);
+    }
+
+    function stopCinematicLoading(success = true) {
+      // Clear all timers/intervals
+      loadingAnimations.forEach(a => {
+        clearTimeout(a);
+        clearInterval(a);
+      });
+      loadingAnimations = [];
+
+      // Mark all steps done
+      document.querySelectorAll('.loading-step').forEach(s => s.classList.add('active', 'done'));
+
+      // Final progress to 100%
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const scanProgressPct = document.getElementById('scan-progress-pct');
+      if (success) {
+        if (progressBar) progressBar.style.width = '100%';
+        if (progressText) progressText.textContent = '100%';
+        if (scanProgressPct) scanProgressPct.textContent = '100%';
+        const scanText = document.getElementById('scan-status-text');
+        if (scanText) scanText.textContent = "✓ Analyse terminée";
+      }
+
+      // Hide scan overlay & pill, show ready panel back, after a brief delay
+      setTimeout(() => {
+        scanOverlay.classList.add('hidden');
+        const pill = document.getElementById('scan-status-pill');
+        if (pill) pill.classList.add('hidden');
+        const reticle = document.getElementById('reticle');
+        if (reticle) reticle.classList.add('hidden');
+        document.getElementById('loading-panel').classList.add('hidden');
+        document.getElementById('ready-panel').classList.remove('hidden');
+      }, success ? 600 : 0);
+    }
+
     analyzeBtn.addEventListener('click', async () => {
       if (!imageBase64 || loading) return;
       loading = true;
       hideError();
       analyzeBtn.disabled = true;
       analyzeBtnText.textContent = 'Analyse en cours...';
-      scanOverlay.classList.remove('hidden');
+
+      startCinematicLoading();
 
       try {
         const response = await fetch('/.netlify/functions/analyze', {
@@ -292,16 +766,23 @@
           throw new Error(errData.error || `Erreur serveur: ${response.status}`);
         }
         const data = await response.json();
-        if (data.error) showError(data.error);
-        else { currentAnalysis = data; renderResults(data); }
+        if (data.error) {
+          stopCinematicLoading(false);
+          showError(data.error);
+        } else {
+          currentAnalysis = data;
+          stopCinematicLoading(true);
+          // Brief delay so user sees the "Terminé" state before results swap in
+          setTimeout(() => renderResults(data), 500);
+        }
       } catch (err) {
         console.error(err);
+        stopCinematicLoading(false);
         showError(err.message || "Échec de l'analyse. Réessayez.");
       } finally {
         loading = false;
         analyzeBtn.disabled = false;
-        analyzeBtnText.textContent = "Estimer la réparation";
-        scanOverlay.classList.add('hidden');
+        analyzeBtnText.textContent = "Lancer l'analyse IA";
       }
     });
 
@@ -627,7 +1108,7 @@
                 ${photoMarkers.map((z, i) => {
                   const color = { minor:'#fde047', moderate:'#fb923c', severe:'#ef4444' }[z.severity] || '#fbbf24';
                   return `
-                    <div class="absolute photo-marker" style="left: ${z.photoX}%; top: ${z.photoY}%; transform: translate(-50%, -50%); cursor:pointer;" data-zone="${z.zone}">
+                    <div class="absolute photo-marker" style="left: ${z.photoX}%; top: ${z.photoY}%; cursor:pointer; animation-delay: ${0.3 + i * 0.15}s;" data-zone="${z.zone}">
                       <div class="relative">
                         <div class="absolute inset-0 rounded-full animate-ping" style="background:${color}; opacity:0.4"></div>
                         <div class="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg" style="background:${color}">${i + 1}</div>
