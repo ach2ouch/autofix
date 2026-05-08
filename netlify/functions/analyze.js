@@ -80,10 +80,21 @@ exports.handler = async (event) => {
 
 Tu reçois ${images.length} photo(s) du même véhicule (${photoDescriptions}). Analyse-les ensemble pour avoir une vue complète du véhicule.
 
-Le propriétaire d'une casse auto veut savoir QUELLES PIÈCES sont ENCORE BONNES POUR LA REVENTE.
+CONTEXTE IMPORTANT: Le propriétaire d'une casse auto a récupéré ce Jetour X70. Même si la voiture est accidentée, BEAUCOUP de pièces sont probablement encore intactes et REVENDABLES. C'est ça l'argent à faire: vendre les pièces non endommagées séparément.
 
-Pour chaque photo, indique sa vue (front/rear/left/right) et la liste des zones endommagées avec photoX, photoY (0-100%).
-Liste les pièces visibles sur l'ensemble des photos (5-10 pièces max).
+LOGIQUE CRITIQUE À RESPECTER:
+- Si la voiture a un choc à l'AVANT seulement → les pièces ARRIÈRE et CÔTÉS sont INTACTES (salvageable: true, condition: "Bon" ou "Neuf")
+- Si la voiture a un choc à GAUCHE seulement → les pièces de DROITE sont INTACTES (salvageable: true)
+- Si une zone n'a aucun dégât visible → ses pièces sont salvageable: true avec condition "Bon"
+- Seules les pièces DIRECTEMENT dans la zone d'impact sont endommagées (salvageable: false)
+- Pour un petit choc, attends-toi à 70-90% de pièces salvageable
+- Pour un gros choc, attends-toi à 40-60% de pièces salvageable
+- Pour total_loss, attends-toi à 20-40% de pièces salvageable
+
+INSTRUCTIONS:
+1. Identifie les zones endommagées (avec photoX, photoY 0-100%)
+2. Liste 7-10 pièces de la base de données: AU MOINS 4-5 doivent être salvageable: true (intactes des zones non touchées) + 2-4 endommagées (zones d'impact)
+3. Pour chaque pièce, vérifie sa zone: si la zone est intacte → salvageable: true. Si la zone est endommagée → salvageable: false.
 
 Réponds UNIQUEMENT en JSON valide (commence {, finit }, pas de markdown).
 
@@ -107,10 +118,21 @@ JSON exact:
       "zone":"front_left",
       "salvageable":true,
       "condition":"Bon",
-      "damageNotesFR":"très court"
+      "damageNotesFR":"très court — POURQUOI cette pièce est bonne ou endommagée"
     }
   ]
 }
+
+EXEMPLE: Si la photo montre un choc avant uniquement, tu dois retourner quelque chose comme:
+- F01-4421010 (Phare avant gauche): salvageable: false, condition: "Endommagé" — "Cassé par le choc"
+- F01-2803505NA-DQ (Pare-chocs avant): salvageable: false, condition: "Endommagé" — "Déformé"
+- F01-4421020 (Phare avant droit): salvageable: true, condition: "Bon" — "Côté non impacté, intact"
+- F01-4433010 (Feu arrière gauche): salvageable: true, condition: "Bon" — "Arrière intact"
+- F01-4433020 (Feu arrière droit): salvageable: true, condition: "Bon" — "Arrière intact"
+- F01-6101010-DY (Porte avant gauche): salvageable: true, condition: "Bon" — "Porte intacte"
+- F01-6101020-DY (Porte avant droite): salvageable: true, condition: "Bon" — "Porte intacte"
+- F01-6201010-DY (Porte arrière gauche): salvageable: true, condition: "Bon"
+- F01-5206020BB (Pare-brise arrière): salvageable: true, condition: "Bon"
 
 zones disponibles: front_left, front_center, front_right, left_side, right_side, rear_left, rear_center, rear_right, hood, roof, trunk, windshield_front, windshield_rear, underbody
 viewDetected: front|rear|left|right
@@ -150,7 +172,7 @@ Pas un Jetour X70? {"error":"Cette voiture n'est pas un Jetour X70"}`;
       signal: controller.signal,
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 3000,
+        max_tokens: 3500,
         messages: [{ role: 'user', content }],
       }),
     });
