@@ -12,14 +12,12 @@
     body { font-family: 'Inter', system-ui, sans-serif; }
     .font-serif { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
 
-    /* ---------- BASIC ANIMATIONS ---------- */
     .fade-in { animation: fadeIn 0.6s ease-out both; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Stagger children */
     .stagger > * { animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; opacity: 0; }
     .stagger > *:nth-child(1) { animation-delay: 0.05s; }
     .stagger > *:nth-child(2) { animation-delay: 0.15s; }
@@ -29,13 +27,11 @@
     .stagger > *:nth-child(6) { animation-delay: 0.55s; }
     .stagger > *:nth-child(7) { animation-delay: 0.65s; }
     .stagger > *:nth-child(8) { animation-delay: 0.75s; }
-    .stagger > *:nth-child(9) { animation-delay: 0.85s; }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Damage markers - blip in one by one */
     .photo-marker { animation: markerBlip 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
     @keyframes markerBlip {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
@@ -43,12 +39,9 @@
       100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
 
-    /* ---------- SCAN ANIMATION (during loading) ---------- */
-    .scan-overlay { background: rgba(0, 0, 0, 0.05); }
+    /* SCAN OVERLAY */
     .scan-line {
-      position: absolute;
-      left: 0; right: 0;
-      height: 3px;
+      position: absolute; left: 0; right: 0; height: 3px;
       background: linear-gradient(90deg, transparent 0%, #fbbf24 30%, #fff 50%, #fbbf24 70%, transparent 100%);
       box-shadow: 0 0 24px 8px rgba(251, 191, 36, 0.6);
       animation: scanSweep 2.5s ease-in-out infinite;
@@ -59,31 +52,18 @@
       92% { opacity: 1; }
       100% { top: 100%; opacity: 0; }
     }
-
-    /* Vertical scan line */
     .scan-line-v {
-      position: absolute;
-      top: 0; bottom: 0;
-      width: 2px;
+      position: absolute; top: 0; bottom: 0; width: 2px;
       background: linear-gradient(180deg, transparent, #fbbf24, transparent);
       box-shadow: 0 0 16px 4px rgba(251, 191, 36, 0.5);
-      animation: scanSweepV 3s ease-in-out infinite;
-      animation-delay: 0.5s;
+      animation: scanSweepV 3s ease-in-out infinite; animation-delay: 0.5s;
     }
     @keyframes scanSweepV {
       0% { left: 0%; opacity: 0; }
-      10% { opacity: 0.7; }
-      90% { opacity: 0.7; }
+      10% { opacity: 0.7; } 90% { opacity: 0.7; }
       100% { left: 100%; opacity: 0; }
     }
-
-    /* Corner brackets - HUD style */
-    .hud-corner {
-      position: absolute;
-      width: 28px; height: 28px;
-      border: 2px solid #fbbf24;
-      animation: hudPulse 1.5s ease-in-out infinite;
-    }
+    .hud-corner { position: absolute; width: 28px; height: 28px; border: 2px solid #fbbf24; animation: hudPulse 1.5s ease-in-out infinite; }
     .hud-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
     .hud-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
     .hud-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
@@ -92,90 +72,44 @@
       0%, 100% { opacity: 0.6; }
       50% { opacity: 1; box-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
     }
-
-    /* Targeting reticle that bounces around the photo */
     .reticle {
-      position: absolute;
-      width: 60px; height: 60px;
-      border: 2px solid #fbbf24;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      position: absolute; width: 60px; height: 60px;
+      border: 2px solid #fbbf24; border-radius: 50%;
+      transform: translate(-50%, -50%); pointer-events: none;
       transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), inset 0 0 20px rgba(251, 191, 36, 0.2);
     }
-    .reticle::before, .reticle::after {
-      content: ''; position: absolute; background: #fbbf24;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
-    }
+    .reticle::before, .reticle::after { content: ''; position: absolute; background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.8); }
     .reticle::before { top: 50%; left: -10px; right: -10px; height: 1.5px; transform: translateY(-50%); }
     .reticle::after { left: 50%; top: -10px; bottom: -10px; width: 1.5px; transform: translateX(-50%); }
-    .reticle-inner {
-      position: absolute; inset: 14px;
-      border: 1.5px solid rgba(251, 191, 36, 0.7);
-      border-radius: 50%;
-      animation: reticleSpin 2s linear infinite;
-    }
+    .reticle-inner { position: absolute; inset: 14px; border: 1.5px solid rgba(251, 191, 36, 0.7); border-radius: 50%; animation: reticleSpin 2s linear infinite; }
     @keyframes reticleSpin {
       0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
       50% { transform: rotate(180deg) scale(0.8); opacity: 1; }
       100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
     }
-
-    /* Particle dots around photo */
-    .particle {
-      position: absolute;
-      width: 4px; height: 4px;
-      background: #fbbf24;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #fbbf24;
-      animation: particleFloat 3s ease-in-out infinite;
-    }
+    .particle { position: absolute; width: 4px; height: 4px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 8px #fbbf24; animation: particleFloat 3s ease-in-out infinite; }
     @keyframes particleFloat {
       0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
       50% { opacity: 1; transform: translateY(-20px) scale(1); }
     }
-
-    /* Glowing aura around photo when loading */
-    .photo-aura {
-      animation: photoGlow 2s ease-in-out infinite;
-    }
-    @keyframes photoGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.15); }
-      50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 80px rgba(251, 191, 36, 0.3); }
-    }
-
-    /* Loading status step animations */
-    .loading-step {
-      opacity: 0;
-      transform: translateX(-12px);
-      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .loading-step.active {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    .loading-step { opacity: 0; transform: translateX(-12px); transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .loading-step.active { opacity: 1; transform: translateX(0); }
     .loading-step.done .step-icon-loading { display: none; }
     .loading-step.done .step-icon-done { display: inline-flex; }
     .loading-step:not(.done) .step-icon-done { display: none; }
     .step-icon-loading { display: inline-flex; }
-
-    /* Spinner */
     .spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(251, 191, 36, 0.2);
-      border-top-color: #fbbf24;
-      border-radius: 50%;
+      border-top-color: #fbbf24; border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Shimmer for percent counter */
     .shimmer {
       background: linear-gradient(90deg, #fbbf24 0%, #fff 50%, #fbbf24 100%);
       background-size: 200% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
+      -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: shimmerSlide 2s linear infinite;
     }
@@ -184,67 +118,45 @@
       100% { background-position: -200% 0; }
     }
 
-    /* Counter animation - numbers that "tick up" */
-    .count-up {
-      animation: countPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-    @keyframes countPop {
-      0% { opacity: 0; transform: translateY(10px) scale(0.9); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* Car zone interactions */
-    .car-zone {
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.2s, filter 0.2s;
-    }
+    /* CAR ZONES */
+    .car-zone { cursor: pointer; transition: opacity 0.2s, transform 0.2s, filter 0.2s; }
     .car-zone:hover { opacity: 0.85; }
-    .car-zone.active {
-      opacity: 1;
-      filter: drop-shadow(0 0 10px currentColor);
-    }
-
+    .car-zone.active { opacity: 1; filter: drop-shadow(0 0 10px currentColor); }
     .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
     @keyframes pulseDot {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(1.3); }
     }
 
-    /* Typewriter text effect */
-    .typewriter {
-      overflow: hidden;
-      white-space: nowrap;
-      animation: typing 1.2s steps(40, end) both;
+    /* 3D ROTATION CONTAINER */
+    .rotation-stage {
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
     }
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 100%; }
+    .rotation-inner {
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
     }
-
-    /* Hero gradient pulse */
-    .hero-pulse-bg {
-      background: radial-gradient(circle at 30% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 50%, rgba(52, 211, 153, 0.08) 0%, transparent 50%);
-      animation: heroPulse 8s ease-in-out infinite;
+    .view-fade {
+      animation: viewFade 0.5s ease-out both;
     }
-    @keyframes heroPulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+    @keyframes viewFade {
+      from { opacity: 0; transform: scale(0.95) rotateY(-15deg); }
+      to { opacity: 1; transform: scale(1) rotateY(0deg); }
     }
 
-    /* Number tick effect */
-    .tick-number {
-      display: inline-block;
-      animation: tickIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    /* Drag cursor */
+    .drag-grab { cursor: grab; }
+    .drag-grab:active { cursor: grabbing; }
+
+    /* Photo upload thumbnails */
+    .photo-thumb {
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    @keyframes tickIn {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
+    .photo-thumb:hover { transform: translateY(-2px); }
   </style>
 </head>
 <body class="bg-stone-50 text-stone-900">
-  <!-- Header -->
   <header class="border-b border-stone-200/60 bg-stone-50/80 backdrop-blur-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 md:px-8 py-5 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -260,7 +172,7 @@
       </div>
       <nav class="hidden md:flex items-center gap-8 text-sm text-stone-600">
         <span class="hover:text-stone-900 cursor-pointer transition-colors">Marketplace</span>
-        <span class="hover:text-stone-900 cursor-pointer transition-colors">Garages</span>
+        <span class="hover:text-stone-900 cursor-pointer transition-colors">Tarifs</span>
         <span class="hover:text-stone-900 cursor-pointer transition-colors">Aide</span>
         <button class="bg-stone-900 text-stone-50 px-5 py-2 rounded-full text-sm hover:bg-stone-800 transition-colors">Mon compte</button>
       </nav>
@@ -279,39 +191,47 @@
           Combien rapporte votre<br /><em class="font-medium italic">épave</em>, pièce par pièce ?
         </h1>
         <p class="text-stone-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-          Téléchargez la photo d'une Jetour X70 accidentée. Notre IA identifie les pièces récupérables, vous donne les références OEM officielles et estime votre revenu potentiel en pièces détachées.
+          Téléchargez jusqu'à <strong class="text-stone-900">4 photos</strong> de votre Jetour X70 (avant, arrière, côtés). Plus de photos = analyse plus précise et vue 3D du véhicule.
         </p>
       </div>
 
-      <div id="dropzone" class="relative bg-white rounded-3xl border-2 border-dashed border-stone-200 hover:border-amber-400 transition-all cursor-pointer p-12 md:p-16 text-center shadow-sm hover:shadow-md max-w-3xl mx-auto">
+      <!-- Multi-photo upload zone -->
+      <div class="max-w-4xl mx-auto">
+        <!-- Slot grid for 4 photos -->
+        <div id="photo-slots" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+          <!-- 4 slots populated by JS -->
+        </div>
+
+        <!-- Hidden file input -->
         <input id="file-input" type="file" accept="image/*" class="hidden" />
-        <div class="flex flex-col items-center gap-5">
-          <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center">
-            <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 7.5m0 0L7.5 12M12 7.5v9"/></svg>
+
+        <!-- Action button -->
+        <div id="action-row" class="flex items-center justify-between gap-4 mt-6">
+          <div class="text-sm text-stone-500">
+            <span id="photo-count-text">0 photo</span> · Vous pouvez en ajouter plus pour une meilleure analyse
           </div>
-          <div>
-            <div class="font-serif text-2xl text-stone-900 mb-2">Déposez la photo de votre X70 ici</div>
-            <div class="text-sm text-stone-500">ou cliquez pour parcourir — JPG, PNG, WebP jusqu'à 10MB</div>
-          </div>
-          <div class="text-xs text-stone-400 mt-2">Astuce : photographiez l'ensemble du véhicule pour une analyse complète</div>
+          <button id="continue-btn" class="hidden bg-stone-900 hover:bg-stone-800 text-stone-50 px-6 py-3 rounded-full text-sm font-medium transition-all flex items-center gap-2 hover:gap-3">
+            Analyser
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </button>
         </div>
       </div>
 
       <!-- Features grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 max-w-5xl mx-auto">
         <div class="bg-white rounded-2xl border border-stone-200 p-6">
           <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
           <div class="font-serif text-lg text-stone-900 mb-1">Références OEM réelles</div>
-          <div class="text-sm text-stone-600">Numéros de pièces officiels Jetour pour chaque élément récupérable</div>
+          <div class="text-sm text-stone-600">Numéros de pièces officiels Jetour pour chaque élément</div>
         </div>
         <div class="bg-white rounded-2xl border border-stone-200 p-6">
           <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
-            <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
           </div>
-          <div class="font-serif text-lg text-stone-900 mb-1">Revenus potentiels</div>
-          <div class="text-sm text-stone-600">Estimation précise de combien vous pouvez gagner pièce par pièce</div>
+          <div class="font-serif text-lg text-stone-900 mb-1">Vue 3D rotative</div>
+          <div class="text-sm text-stone-600">Faites tourner le véhicule pour inspecter chaque angle</div>
         </div>
         <div class="bg-white rounded-2xl border border-stone-200 p-6">
           <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-4">
@@ -323,145 +243,77 @@
       </div>
     </div>
 
-    <!-- PREVIEW + ANALYZE -->
-    <div id="preview-section" class="hidden fade-in grid md:grid-cols-2 gap-10 items-start">
+    <!-- LOADING SECTION -->
+    <div id="loading-section" class="hidden fade-in grid md:grid-cols-2 gap-10 items-start">
       <div class="relative">
         <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4 flex items-center gap-2">
-          <span>Votre photo</span>
-          <span id="scan-status-pill" class="hidden inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px] tracking-wider font-medium">
+          <span>Vos photos</span>
+          <span class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px] tracking-wider font-medium">
             <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
             ANALYSE EN COURS
           </span>
         </div>
-        <div id="photo-frame" class="relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 shadow-sm transition-all">
-          <img id="preview-img" alt="Véhicule" class="w-full h-auto transition-all duration-700" />
-          <button id="reset-btn-preview" class="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur border border-stone-200 hover:border-stone-400 rounded-full flex items-center justify-center transition-colors shadow-sm z-30">
-            <svg class="w-4 h-4 text-stone-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-
-          <!-- CINEMATIC SCAN OVERLAY -->
-          <div id="scan-overlay" class="hidden absolute inset-0 overflow-hidden pointer-events-none z-20">
-            <!-- Dark tint -->
-            <div class="absolute inset-0 bg-stone-900/30"></div>
-            <!-- HUD corners -->
-            <div class="hud-corner tl"></div>
-            <div class="hud-corner tr"></div>
-            <div class="hud-corner bl"></div>
-            <div class="hud-corner br"></div>
-            <!-- Horizontal scan line -->
-            <div class="scan-line"></div>
-            <!-- Vertical scan line -->
-            <div class="scan-line-v"></div>
-            <!-- Targeting reticle (moves around photo) -->
-            <div id="reticle" class="reticle hidden">
-              <div class="reticle-inner"></div>
-            </div>
-            <!-- Floating particles -->
-            <div class="particle" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
-            <div class="particle" style="top: 70%; left: 80%; animation-delay: 0.5s;"></div>
-            <div class="particle" style="top: 40%; left: 50%; animation-delay: 1s;"></div>
-            <div class="particle" style="top: 85%; left: 30%; animation-delay: 1.5s;"></div>
-            <div class="particle" style="top: 30%; left: 90%; animation-delay: 2s;"></div>
-            <div class="particle" style="top: 60%; left: 10%; animation-delay: 2.5s;"></div>
-            <!-- Live text overlay (typewriter style) -->
-            <div class="absolute bottom-4 left-4 right-4 z-10">
-              <div class="bg-stone-900/80 backdrop-blur border border-amber-400/30 rounded-xl px-4 py-2.5 flex items-center gap-3 text-amber-100 text-xs">
-                <div class="spinner"></div>
-                <div id="scan-status-text" class="font-mono tracking-wide flex-1 truncate">Initialisation du scanner...</div>
-                <div id="scan-progress-pct" class="text-amber-400 font-bold tabular-nums">0%</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Photo gallery during loading -->
+        <div id="loading-gallery" class="grid grid-cols-2 gap-3"></div>
       </div>
 
       <div class="md:sticky md:top-28">
-        <!-- Default state: ready to analyze -->
-        <div id="ready-panel">
-          <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Prêt à analyser</div>
-          <div class="bg-white rounded-2xl border border-stone-200 p-8 shadow-sm">
-            <h3 class="font-serif text-3xl font-light text-stone-900 mb-3">Voyons ce qui est récupérable.</h3>
-            <p class="text-stone-600 leading-relaxed mb-8">L'IA va confirmer le modèle X70, identifier chaque pièce de carrosserie/vitrage/éclairage visible, déterminer si elle est intacte ou endommagée, et calculer votre revenu potentiel avec les références OEM officielles.</p>
-            <div class="space-y-3 mb-8">
-              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Vérification du modèle Jetour X70</span></div>
-              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Cartographie des zones intactes vs endommagées</span></div>
-              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Identification des pièces avec références OEM</span></div>
-              <div class="flex items-center gap-3 text-sm text-stone-700"><div class="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><span>Estimation du revenu potentiel en TND</span></div>
-            </div>
-            <button id="analyze-btn" class="w-full bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-stone-50 font-medium py-4 rounded-full transition-all flex items-center justify-center gap-2 hover:gap-3 hover:scale-[1.02]">
-              <span id="analyze-btn-text">Lancer l'analyse IA</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </button>
-          </div>
+        <div class="text-xs tracking-[0.15em] uppercase text-amber-700 mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+          Analyse IA en direct
         </div>
-
-        <!-- Loading state: live AI analysis steps -->
-        <div id="loading-panel" class="hidden">
-          <div class="text-xs tracking-[0.15em] uppercase text-amber-700 mb-4 flex items-center gap-2">
-            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-            Analyse IA en direct
-          </div>
-          <div class="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl border border-amber-400/20 p-8 shadow-2xl text-stone-50 relative overflow-hidden">
-            <!-- Animated background glow -->
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl animate-pulse"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
-
-            <div class="relative">
-              <h3 class="font-serif text-2xl md:text-3xl font-light mb-2">
-                <span class="shimmer">Analyse en cours...</span>
-              </h3>
-              <p class="text-stone-400 text-sm mb-8">L'IA examine votre photo en détail</p>
-
-              <!-- Loading steps - they activate one by one -->
-              <div class="space-y-3.5 mb-8" id="loading-steps">
-                <div class="loading-step flex items-center gap-3 text-sm" data-step="1">
-                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="step-icon-loading"><div class="spinner"></div></span>
-                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-                  </div>
-                  <span class="step-text font-mono tracking-wide">Vérification du modèle Jetour X70</span>
+        <div class="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl border border-amber-400/20 p-8 shadow-2xl text-stone-50 relative overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+          <div class="relative">
+            <h3 class="font-serif text-2xl md:text-3xl font-light mb-2"><span class="shimmer">Analyse en cours...</span></h3>
+            <p class="text-stone-400 text-sm mb-8">L'IA examine vos photos en détail</p>
+            <div class="space-y-3.5 mb-8" id="loading-steps">
+              <div class="loading-step flex items-center gap-3 text-sm" data-step="1">
+                <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span class="step-icon-loading"><div class="spinner"></div></span>
+                  <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
                 </div>
-                <div class="loading-step flex items-center gap-3 text-sm" data-step="2">
-                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="step-icon-loading"><div class="spinner"></div></span>
-                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-                  </div>
-                  <span class="step-text font-mono tracking-wide">Cartographie zones intactes / endommagées</span>
-                </div>
-                <div class="loading-step flex items-center gap-3 text-sm" data-step="3">
-                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="step-icon-loading"><div class="spinner"></div></span>
-                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-                  </div>
-                  <span class="step-text font-mono tracking-wide">Identification des pièces récupérables</span>
-                </div>
-                <div class="loading-step flex items-center gap-3 text-sm" data-step="4">
-                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="step-icon-loading"><div class="spinner"></div></span>
-                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-                  </div>
-                  <span class="step-text font-mono tracking-wide">Recherche des références OEM officielles</span>
-                </div>
-                <div class="loading-step flex items-center gap-3 text-sm" data-step="5">
-                  <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="step-icon-loading"><div class="spinner"></div></span>
-                    <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-                  </div>
-                  <span class="step-text font-mono tracking-wide">Calcul du revenu potentiel en TND</span>
-                </div>
+                <span class="font-mono tracking-wide">Vérification du modèle Jetour X70</span>
               </div>
-
-              <!-- Progress bar -->
-              <div class="space-y-2">
-                <div class="flex items-baseline justify-between text-xs">
-                  <span class="text-stone-400 tracking-wide">Progression</span>
-                  <span id="progress-text" class="text-amber-400 font-mono tabular-nums">0%</span>
+              <div class="loading-step flex items-center gap-3 text-sm" data-step="2">
+                <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span class="step-icon-loading"><div class="spinner"></div></span>
+                  <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
                 </div>
-                <div class="h-1.5 bg-stone-800 rounded-full overflow-hidden">
-                  <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
-                </div>
-                <div id="time-elapsed" class="text-[10px] text-stone-500 font-mono">Temps écoulé : 0.0s</div>
+                <span class="font-mono tracking-wide">Cartographie multi-vues</span>
               </div>
+              <div class="loading-step flex items-center gap-3 text-sm" data-step="3">
+                <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span class="step-icon-loading"><div class="spinner"></div></span>
+                  <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                </div>
+                <span class="font-mono tracking-wide">Identification des pièces récupérables</span>
+              </div>
+              <div class="loading-step flex items-center gap-3 text-sm" data-step="4">
+                <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span class="step-icon-loading"><div class="spinner"></div></span>
+                  <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                </div>
+                <span class="font-mono tracking-wide">Recherche des références OEM</span>
+              </div>
+              <div class="loading-step flex items-center gap-3 text-sm" data-step="5">
+                <div class="w-7 h-7 bg-stone-800 border border-amber-400/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span class="step-icon-loading"><div class="spinner"></div></span>
+                  <span class="step-icon-done"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+                </div>
+                <span class="font-mono tracking-wide">Calcul du revenu potentiel</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-baseline justify-between text-xs">
+                <span class="text-stone-400 tracking-wide">Progression</span>
+                <span id="progress-text" class="text-amber-400 font-mono tabular-nums">0%</span>
+              </div>
+              <div class="h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <div id="time-elapsed" class="text-[10px] text-stone-500 font-mono">Temps écoulé : 0.0s</div>
             </div>
           </div>
         </div>
@@ -489,31 +341,117 @@
         </div>
         <span class="font-serif text-stone-900">AutoPieces.tn</span>
       </div>
-      <div class="text-sm text-stone-500">Estimation et marketplace de pièces auto en Tunisie</div>
+      <div class="text-sm text-stone-500">Spécialiste Jetour X70 · Marketplace pièces auto en Tunisie</div>
     </div>
   </footer>
 
   <script>
-    let imageDataUrl = null, imageBase64 = null, imageMediaType = null, loading = false;
-    let currentAnalysis = null, activeZone = null;
+    // ================== STATE ==================
+    // photos is an array of {dataUrl, base64, mediaType, viewLabel} - max 4
+    let photos = [];
+    let pendingViewSlot = null; // which slot we're filling
+    let loading = false;
+    let currentAnalysis = null;
+    let activeZone = null;
+    let activePartsTab = 'all'; // 'all' | 'salvageable' | 'damaged'
+    let currentView = 'top'; // diagram view
+    let autoRotateInterval = null;
 
+    const VIEW_LABELS = [
+      { key: 'front', labelFR: 'Avant', icon: '🚗' },
+      { key: 'right', labelFR: 'Côté droit', icon: '➡️' },
+      { key: 'rear', labelFR: 'Arrière', icon: '🔙' },
+      { key: 'left', labelFR: 'Côté gauche', icon: '⬅️' },
+    ];
+
+    // ================== DOM ==================
     const heroSection = document.getElementById('hero-section');
-    const previewSection = document.getElementById('preview-section');
+    const loadingSection = document.getElementById('loading-section');
     const resultsSection = document.getElementById('results-section');
     const errorBox = document.getElementById('error-box');
     const errorText = document.getElementById('error-text');
-    const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('file-input');
-    const previewImg = document.getElementById('preview-img');
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const analyzeBtnText = document.getElementById('analyze-btn-text');
-    const scanOverlay = document.getElementById('scan-overlay');
+    const photoSlotsContainer = document.getElementById('photo-slots');
+    const photoCountText = document.getElementById('photo-count-text');
+    const continueBtn = document.getElementById('continue-btn');
 
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-amber-400', 'bg-amber-50/30'); });
-    dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.classList.remove('border-amber-400', 'bg-amber-50/30'); });
-    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('border-amber-400', 'bg-amber-50/30'); handleFile(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    // ================== PHOTO SLOTS ==================
+    function renderPhotoSlots() {
+      photoSlotsContainer.innerHTML = VIEW_LABELS.map((view, i) => {
+        const photo = photos.find(p => p.viewLabel === view.key);
+        if (photo) {
+          return `
+            <div class="photo-thumb relative bg-white rounded-2xl border-2 border-emerald-300 overflow-hidden shadow-sm">
+              <img src="${photo.dataUrl}" alt="${view.labelFR}" class="w-full h-32 md:h-40 object-cover" />
+              <div class="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] tracking-wider font-bold px-2 py-0.5 rounded-full">
+                ✓ ${view.labelFR.toUpperCase()}
+              </div>
+              <button class="remove-photo absolute top-2 right-2 w-7 h-7 bg-white/90 backdrop-blur border border-stone-200 hover:border-red-400 hover:text-red-600 rounded-full flex items-center justify-center transition-colors shadow-sm" data-view="${view.key}">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>`;
+        } else {
+          return `
+            <button class="add-photo photo-thumb relative bg-white rounded-2xl border-2 border-dashed border-stone-200 hover:border-amber-400 transition-all p-4 h-32 md:h-40 flex flex-col items-center justify-center gap-2 group" data-view="${view.key}">
+              <div class="w-10 h-10 bg-stone-100 group-hover:bg-amber-100 rounded-xl flex items-center justify-center transition-colors">
+                <svg class="w-5 h-5 text-stone-500 group-hover:text-amber-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <div class="text-xs text-stone-500 group-hover:text-stone-900 font-medium tracking-wide transition-colors">${view.labelFR}</div>
+              <div class="text-[10px] text-stone-400">cliquer pour ajouter</div>
+            </button>`;
+        }
+      }).join('');
+
+      // Wire up handlers
+      photoSlotsContainer.querySelectorAll('.add-photo').forEach(btn => {
+        btn.addEventListener('click', () => {
+          pendingViewSlot = btn.dataset.view;
+          fileInput.click();
+        });
+      });
+      photoSlotsContainer.querySelectorAll('.remove-photo').forEach(btn => {
+        btn.addEventListener('click', () => {
+          photos = photos.filter(p => p.viewLabel !== btn.dataset.view);
+          updateUI();
+        });
+      });
+    }
+
+    function updateUI() {
+      renderPhotoSlots();
+      photoCountText.textContent = `${photos.length} photo${photos.length !== 1 ? 's' : ''}`;
+      if (photos.length > 0) {
+        continueBtn.classList.remove('hidden');
+      } else {
+        continueBtn.classList.add('hidden');
+      }
+    }
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file || !pendingViewSlot) return;
+      if (!file.type.startsWith('image/')) {
+        showError('Veuillez sélectionner une image');
+        return;
+      }
+      try {
+        const { dataUrl, mediaType } = await compressImage(file);
+        // Replace any existing photo with the same view label
+        photos = photos.filter(p => p.viewLabel !== pendingViewSlot);
+        photos.push({
+          dataUrl,
+          base64: dataUrl.split(',')[1],
+          mediaType,
+          viewLabel: pendingViewSlot,
+        });
+        pendingViewSlot = null;
+        fileInput.value = '';
+        updateUI();
+        hideError();
+      } catch (err) {
+        showError("Impossible de traiter l'image.");
+      }
+    });
 
     function compressImage(file) {
       return new Promise((resolve, reject) => {
@@ -523,7 +461,7 @@
           const img = new Image();
           img.onerror = () => reject(new Error('Format non supporté'));
           img.onload = () => {
-            const MAX_DIM = 1280;
+            const MAX_DIM = 1024; // smaller since we may have 4 of them
             let { width, height } = img;
             if (width > MAX_DIM || height > MAX_DIM) {
               if (width > height) {
@@ -541,7 +479,7 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, width, height);
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
             resolve({ dataUrl, mediaType: 'image/jpeg' });
           };
           img.src = e.target.result;
@@ -550,214 +488,134 @@
       });
     }
 
-    async function handleFile(file) {
-      if (!file) return;
-      if (!file.type.startsWith('image/')) { showError('Veuillez télécharger une image'); return; }
-      hideError();
-      try {
-        const { dataUrl, mediaType } = await compressImage(file);
-        imageDataUrl = dataUrl;
-        imageBase64 = dataUrl.split(',')[1];
-        imageMediaType = mediaType;
-        previewImg.src = dataUrl;
-        heroSection.classList.add('hidden');
-        previewSection.classList.remove('hidden');
-        resultsSection.classList.add('hidden');
-      } catch (err) {
-        console.error(err);
-        showError("Impossible de traiter l'image.");
-      }
-    }
-
     function reset() {
-      imageDataUrl = null; imageBase64 = null; imageMediaType = null;
-      currentAnalysis = null; activeZone = null;
-      fileInput.value = '';
+      photos = [];
+      currentAnalysis = null;
+      activeZone = null;
+      activePartsTab = 'all';
+      currentView = 'top';
+      stopAutoRotate();
       heroSection.classList.remove('hidden');
-      previewSection.classList.add('hidden');
+      loadingSection.classList.add('hidden');
       resultsSection.classList.add('hidden');
       hideError();
+      updateUI();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    document.getElementById('reset-btn-preview').addEventListener('click', reset);
 
     function showError(msg) { errorText.textContent = msg; errorBox.classList.remove('hidden'); }
     function hideError() { errorBox.classList.add('hidden'); }
 
-    // ================ CINEMATIC LOADING ORCHESTRATION ================
-    let loadingAnimations = []; // track to cancel on completion
+    // ================== LOADING ANIMATION ==================
+    let loadingAnimations = [];
     let scanStartTime = 0;
-
     const SCAN_MESSAGES = [
       "Initialisation du scanner IA...",
-      "Calibration de la vision artificielle...",
       "Vérification du modèle Jetour X70...",
-      "Détection des contours du véhicule...",
-      "Analyse de la zone avant...",
-      "Analyse des côtés du véhicule...",
-      "Analyse de la zone arrière...",
-      "Identification des points d'impact...",
-      "Évaluation pièce par pièce...",
+      "Détection des contours...",
+      "Analyse de toutes les vues...",
       "Recherche dans la base OEM Jetour...",
       "Récupération des références F01-XXX...",
       "Classification: récupérable ou endommagé...",
       "Calcul des prix sur le marché tunisien...",
       "Estimation du revenu potentiel...",
       "Comparaison vente entière vs pièces...",
-      "Vérification des compatibilités...",
       "Génération du rapport final...",
-      "Finalisation de l'estimation..."
     ];
 
-    function startCinematicLoading() {
+    function startLoadingAnimation() {
       scanStartTime = Date.now();
 
-      // Show scan overlay & status pill
-      scanOverlay.classList.remove('hidden');
-      const pill = document.getElementById('scan-status-pill');
-      if (pill) pill.classList.remove('hidden');
+      // Render photo gallery in loading
+      const gallery = document.getElementById('loading-gallery');
+      gallery.innerHTML = photos.map((p, i) => `
+        <div class="relative bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
+          <img src="${p.dataUrl}" alt="${p.viewLabel}" class="w-full h-40 object-cover" />
+          <div class="absolute top-2 left-2 bg-amber-400 text-stone-900 text-[10px] tracking-wider font-bold px-2 py-0.5 rounded-full">
+            ${(VIEW_LABELS.find(v => v.key === p.viewLabel)?.labelFR || p.viewLabel).toUpperCase()}
+          </div>
+          <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute inset-0 bg-stone-900/30"></div>
+            <div class="hud-corner tl"></div>
+            <div class="hud-corner tr"></div>
+            <div class="hud-corner bl"></div>
+            <div class="hud-corner br"></div>
+            <div class="scan-line" style="animation-delay: ${i * 0.4}s"></div>
+            <div class="scan-line-v" style="animation-delay: ${0.5 + i * 0.4}s"></div>
+            <div class="particle" style="top: 20%; left: 30%; animation-delay: ${i * 0.3}s;"></div>
+            <div class="particle" style="top: 70%; left: 70%; animation-delay: ${0.5 + i * 0.3}s;"></div>
+          </div>
+        </div>
+      `).join('');
 
-      // Swap panels: hide ready, show loading
-      document.getElementById('ready-panel').classList.add('hidden');
-      document.getElementById('loading-panel').classList.remove('hidden');
-
-      // Reset all loading steps
-      document.querySelectorAll('.loading-step').forEach(s => {
-        s.classList.remove('active', 'done');
-      });
-
-      // ========= 1. Activate steps progressively =========
+      // Reset & activate steps
+      document.querySelectorAll('.loading-step').forEach(s => s.classList.remove('active', 'done'));
       const totalSteps = 5;
-      const stepActivationTime = 800; // ms between step activations
       for (let i = 0; i < totalSteps; i++) {
-        const t = setTimeout(() => {
+        loadingAnimations.push(setTimeout(() => {
           const step = document.querySelector(`.loading-step[data-step="${i + 1}"]`);
           if (step) step.classList.add('active');
-        }, i * stepActivationTime);
-        loadingAnimations.push(t);
+        }, i * 700));
       }
-
-      // Mark steps as done over time (visual progress as analysis happens)
-      // We'll mark them done one by one - last one done by completion
       for (let i = 0; i < totalSteps; i++) {
-        const t = setTimeout(() => {
+        loadingAnimations.push(setTimeout(() => {
           const step = document.querySelector(`.loading-step[data-step="${i + 1}"]`);
           if (step) step.classList.add('done');
-        }, 1500 + i * 1800);
-        loadingAnimations.push(t);
+        }, 1400 + i * 1700));
       }
 
-      // ========= 2. Cycle through scan status messages =========
-      const scanText = document.getElementById('scan-status-text');
-      let msgIndex = 0;
-      const cycleMessages = () => {
-        if (scanText) scanText.textContent = SCAN_MESSAGES[msgIndex % SCAN_MESSAGES.length];
-        msgIndex++;
-      };
-      cycleMessages();
-      const msgInterval = setInterval(cycleMessages, 1100);
-      loadingAnimations.push(msgInterval);
-
-      // ========= 3. Move targeting reticle around photo =========
-      const reticle = document.getElementById('reticle');
-      if (reticle) {
-        reticle.classList.remove('hidden');
-        const positions = [
-          { x: 25, y: 30 }, { x: 75, y: 35 }, { x: 50, y: 60 },
-          { x: 30, y: 75 }, { x: 80, y: 70 }, { x: 50, y: 25 },
-          { x: 20, y: 50 }, { x: 70, y: 80 }, { x: 60, y: 40 },
-        ];
-        let posIndex = 0;
-        const moveReticle = () => {
-          const p = positions[posIndex % positions.length];
-          reticle.style.left = p.x + '%';
-          reticle.style.top = p.y + '%';
-          posIndex++;
-        };
-        moveReticle();
-        const reticleInterval = setInterval(moveReticle, 900);
-        loadingAnimations.push(reticleInterval);
-      }
-
-      // ========= 4. Animate progress bar (0% to ~85%) =========
-      // Smoothly progress over expected ~10s, plateaus near end so it doesn't finish before API returns
+      // Progress bar
       const progressBar = document.getElementById('progress-bar');
       const progressText = document.getElementById('progress-text');
-      const scanProgressPct = document.getElementById('scan-progress-pct');
       let pct = 0;
       const progressInterval = setInterval(() => {
-        // Asymptotic curve - slows down as it approaches 85%
         const target = 85;
         pct += (target - pct) * 0.02;
         if (pct >= target - 0.1) pct = target;
         const display = Math.round(pct);
-        if (progressBar) progressBar.style.width = display + '%';
-        if (progressText) progressText.textContent = display + '%';
-        if (scanProgressPct) scanProgressPct.textContent = display + '%';
+        progressBar.style.width = display + '%';
+        progressText.textContent = display + '%';
       }, 100);
       loadingAnimations.push(progressInterval);
 
-      // ========= 5. Time elapsed counter =========
+      // Time elapsed
       const timeEl = document.getElementById('time-elapsed');
-      const timeInterval = setInterval(() => {
-        if (timeEl) {
-          const elapsed = ((Date.now() - scanStartTime) / 1000).toFixed(1);
-          timeEl.textContent = `Temps écoulé : ${elapsed}s`;
-        }
-      }, 100);
-      loadingAnimations.push(timeInterval);
+      loadingAnimations.push(setInterval(() => {
+        const elapsed = ((Date.now() - scanStartTime) / 1000).toFixed(1);
+        timeEl.textContent = `Temps écoulé : ${elapsed}s`;
+      }, 100));
     }
 
-    function stopCinematicLoading(success = true) {
-      // Clear all timers/intervals
-      loadingAnimations.forEach(a => {
-        clearTimeout(a);
-        clearInterval(a);
-      });
+    function stopLoadingAnimation(success = true) {
+      loadingAnimations.forEach(a => { clearTimeout(a); clearInterval(a); });
       loadingAnimations = [];
-
-      // Mark all steps done
       document.querySelectorAll('.loading-step').forEach(s => s.classList.add('active', 'done'));
-
-      // Final progress to 100%
-      const progressBar = document.getElementById('progress-bar');
-      const progressText = document.getElementById('progress-text');
-      const scanProgressPct = document.getElementById('scan-progress-pct');
       if (success) {
-        if (progressBar) progressBar.style.width = '100%';
-        if (progressText) progressText.textContent = '100%';
-        if (scanProgressPct) scanProgressPct.textContent = '100%';
-        const scanText = document.getElementById('scan-status-text');
-        if (scanText) scanText.textContent = "✓ Analyse terminée";
+        document.getElementById('progress-bar').style.width = '100%';
+        document.getElementById('progress-text').textContent = '100%';
       }
-
-      // Hide scan overlay & pill, show ready panel back, after a brief delay
-      setTimeout(() => {
-        scanOverlay.classList.add('hidden');
-        const pill = document.getElementById('scan-status-pill');
-        if (pill) pill.classList.add('hidden');
-        const reticle = document.getElementById('reticle');
-        if (reticle) reticle.classList.add('hidden');
-        document.getElementById('loading-panel').classList.add('hidden');
-        document.getElementById('ready-panel').classList.remove('hidden');
-      }, success ? 600 : 0);
     }
 
-    analyzeBtn.addEventListener('click', async () => {
-      if (!imageBase64 || loading) return;
+    // ================== ANALYZE ==================
+    continueBtn.addEventListener('click', async () => {
+      if (photos.length === 0 || loading) return;
       loading = true;
       hideError();
-      analyzeBtn.disabled = true;
-      analyzeBtnText.textContent = 'Analyse en cours...';
-
-      startCinematicLoading();
+      heroSection.classList.add('hidden');
+      loadingSection.classList.remove('hidden');
+      startLoadingAnimation();
 
       try {
         const response = await fetch('/.netlify/functions/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64, imageMediaType })
+          body: JSON.stringify({
+            images: photos.map(p => ({
+              imageBase64: p.base64,
+              imageMediaType: p.mediaType,
+              viewLabel: p.viewLabel,
+            }))
+          })
         });
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
@@ -765,25 +623,30 @@
         }
         const data = await response.json();
         if (data.error) {
-          stopCinematicLoading(false);
+          stopLoadingAnimation(false);
+          loadingSection.classList.add('hidden');
+          heroSection.classList.remove('hidden');
           showError(data.error);
         } else {
           currentAnalysis = data;
-          stopCinematicLoading(true);
-          // Brief delay so user sees the "Terminé" state before results swap in
-          setTimeout(() => renderResults(data), 500);
+          stopLoadingAnimation(true);
+          setTimeout(() => {
+            loadingSection.classList.add('hidden');
+            renderResults(data);
+          }, 500);
         }
       } catch (err) {
         console.error(err);
-        stopCinematicLoading(false);
+        stopLoadingAnimation(false);
+        loadingSection.classList.add('hidden');
+        heroSection.classList.remove('hidden');
         showError(err.message || "Échec de l'analyse. Réessayez.");
       } finally {
         loading = false;
-        analyzeBtn.disabled = false;
-        analyzeBtnText.textContent = "Lancer l'analyse IA";
       }
     });
 
+    // ================== HELPERS ==================
     function fmt(n) { return n != null ? n.toLocaleString('fr-FR') + ' DT' : '—'; }
     function escapeHtml(str) {
       if (str == null) return '';
@@ -794,6 +657,25 @@
       none: '#86efac', minor: '#fde047', moderate: '#fb923c', severe: '#ef4444',
     };
 
+    function zoneNamesFR() {
+      return {
+        front_left: 'Avant gauche', front_center: 'Avant centre', front_right: 'Avant droit',
+        hood: 'Capot', windshield_front: 'Pare-brise avant', roof: 'Toit',
+        left_side: 'Côté gauche', right_side: 'Côté droit',
+        windshield_rear: 'Pare-brise arrière', trunk: 'Coffre',
+        rear_left: 'Arrière gauche', rear_center: 'Arrière centre', rear_right: 'Arrière droit',
+        underbody: 'Soubassement',
+      };
+    }
+    function severityLabelFR(s) {
+      return { none: 'Aucun', minor: 'Léger', moderate: 'Modéré', severe: 'Important' }[s] || s;
+    }
+
+    // Map photo views to diagram views
+    const VIEW_TO_DIAGRAM = { front: 'front', rear: 'rear', left: 'side', right: 'side', top: 'top' };
+    const DIAGRAM_VIEWS = ['top', 'front', 'side', 'rear']; // for rotation order
+
+    // ================== CAR SVG (4 views) ==================
     function carSvg(damageZones, view) {
       view = view || 'top';
       const sevMap = {};
@@ -806,11 +688,9 @@
             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e7e5e4" stroke-width="0.5"/>
           </pattern>
           <linearGradient id="bodyGrad-${view}" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="#fafaf9"/>
-            <stop offset="1" stop-color="#e7e5e4"/>
+            <stop offset="0" stop-color="#fafaf9"/><stop offset="1" stop-color="#e7e5e4"/>
           </linearGradient>
-        </defs>
-      `;
+        </defs>`;
 
       const dots = (centers) => (damageZones || []).filter(z => z.severity !== 'none' && centers[z.zone]).map(z => {
         const [cx, cy] = centers[z.zone];
@@ -851,8 +731,7 @@
               <text x="200" y="588" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="#78716c" letter-spacing="2">ARRIÈRE</text>
             </g>
             ${dots(centers)}
-          </svg>
-        `;
+          </svg>`;
       }
       if (view === 'front') {
         const centers = { front_left: [110, 220], front_center: [200, 220], front_right: [290, 220], hood: [200, 130], windshield_front: [200, 75], left_side: [60, 220], right_side: [340, 220], roof: [200, 40] };
@@ -881,8 +760,7 @@
               <text x="200" y="335" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="#78716c" letter-spacing="2">VUE AVANT</text>
             </g>
             ${dots(centers)}
-          </svg>
-        `;
+          </svg>`;
       }
       if (view === 'side') {
         const centers = { front_left: [70, 180], front_center: [70, 180], front_right: [70, 180], hood: [150, 145], windshield_front: [218, 95], roof: [240, 88], left_side: [240, 195], windshield_rear: [263, 95], trunk: [312, 145], rear_left: [400, 180], rear_center: [400, 180], rear_right: [400, 180] };
@@ -909,8 +787,6 @@
               <line x1="285" y1="165" x2="285" y2="220" stroke="#78716c" stroke-width="1.2"/>
               <rect x="105" y="115" width="80" height="45" fill="#e0f2fe" opacity="0.4" stroke="#78716c" stroke-width="1"/>
               <rect x="200" y="115" width="80" height="45" fill="#e0f2fe" opacity="0.4" stroke="#78716c" stroke-width="1"/>
-              <rect x="135" y="180" width="20" height="3" rx="1" fill="#78716c"/>
-              <rect x="225" y="180" width="20" height="3" rx="1" fill="#78716c"/>
               <circle cx="115" cy="225" r="32" fill="#1c1917"/>
               <circle cx="115" cy="225" r="14" fill="#57534e"/>
               <circle cx="365" cy="225" r="32" fill="#1c1917"/>
@@ -922,8 +798,7 @@
               <text x="240" y="305" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="#78716c" letter-spacing="2">VUE LATÉRALE</text>
             </g>
             ${dots(centers)}
-          </svg>
-        `;
+          </svg>`;
       }
       if (view === 'rear') {
         const centers = { rear_left: [110, 220], rear_center: [200, 220], rear_right: [290, 220], trunk: [200, 130], windshield_rear: [200, 75], left_side: [60, 220], right_side: [340, 220], roof: [200, 40] };
@@ -945,55 +820,216 @@
               <rect x="265" y="180" width="40" height="20" rx="2" fill="#fecaca" stroke="#78716c" stroke-width="1.5"/>
               <rect x="160" y="215" width="80" height="22" fill="#fafaf9" stroke="#78716c" stroke-width="1"/>
               <text x="200" y="231" text-anchor="middle" font-family="Inter" font-size="9" font-weight="600" fill="#78716c">TUNISIA</text>
-              <rect x="190" y="160" width="20" height="4" rx="1" fill="#78716c"/>
               <ellipse cx="80" cy="290" rx="25" ry="10" fill="#1c1917"/>
               <ellipse cx="320" cy="290" rx="25" ry="10" fill="#1c1917"/>
               <text x="200" y="335" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="#78716c" letter-spacing="2">VUE ARRIÈRE</text>
             </g>
             ${dots(centers)}
-          </svg>
-        `;
+          </svg>`;
       }
       return '';
     }
 
-    function zoneNamesFR() {
-      return {
-        front_left: 'Avant gauche', front_center: 'Avant centre', front_right: 'Avant droit',
-        hood: 'Capot', windshield_front: 'Pare-brise avant', roof: 'Toit',
-        left_side: 'Côté gauche', right_side: 'Côté droit',
-        windshield_rear: 'Pare-brise arrière', trunk: 'Coffre',
-        rear_left: 'Arrière gauche', rear_center: 'Arrière centre', rear_right: 'Arrière droit',
-        underbody: 'Soubassement',
+    // ================== AUTO-ROTATE ==================
+    function startAutoRotate() {
+      if (autoRotateInterval) return;
+      autoRotateInterval = setInterval(() => {
+        const idx = DIAGRAM_VIEWS.indexOf(currentView);
+        const nextView = DIAGRAM_VIEWS[(idx + 1) % DIAGRAM_VIEWS.length];
+        switchDiagramView(nextView);
+      }, 2500);
+      const btn = document.getElementById('autorotate-btn');
+      if (btn) {
+        btn.classList.add('bg-amber-400', 'text-stone-900');
+        btn.classList.remove('bg-stone-100', 'text-stone-700');
+        btn.querySelector('.btn-label').textContent = '⏸ Stop';
+      }
+    }
+    function stopAutoRotate() {
+      if (autoRotateInterval) {
+        clearInterval(autoRotateInterval);
+        autoRotateInterval = null;
+      }
+      const btn = document.getElementById('autorotate-btn');
+      if (btn) {
+        btn.classList.remove('bg-amber-400', 'text-stone-900');
+        btn.classList.add('bg-stone-100', 'text-stone-700');
+        btn.querySelector('.btn-label').textContent = '▶ Auto';
+      }
+    }
+    function toggleAutoRotate() {
+      if (autoRotateInterval) stopAutoRotate(); else startAutoRotate();
+    }
+
+    // Find photo matching a diagram view (front/side/rear)
+    function getPhotoForView(diagramView) {
+      if (!currentAnalysis) return null;
+      const photoCount = currentAnalysis.photoCount || photos.length;
+      const allPhotos = photos; // photos array still in scope after analysis
+      if (diagramView === 'front') return allPhotos.find(p => p.viewLabel === 'front');
+      if (diagramView === 'rear') return allPhotos.find(p => p.viewLabel === 'rear');
+      if (diagramView === 'side') return allPhotos.find(p => p.viewLabel === 'left') || allPhotos.find(p => p.viewLabel === 'right');
+      return null;
+    }
+
+    function switchDiagramView(newView) {
+      if (newView === currentView) return;
+      currentView = newView;
+      // Update tabs
+      document.querySelectorAll('.view-tab').forEach(t => {
+        t.classList.remove('active', 'bg-white', 'text-stone-900', 'shadow-sm');
+        t.classList.add('text-stone-600');
+      });
+      const target = document.querySelector(`.view-tab[data-view="${newView}"]`);
+      if (target) {
+        target.classList.add('active', 'bg-white', 'text-stone-900', 'shadow-sm');
+        target.classList.remove('text-stone-600');
+      }
+      // Re-render diagram with view fade
+      const diagram = document.getElementById('car-diagram');
+      if (diagram) {
+        diagram.classList.remove('view-fade');
+        void diagram.offsetWidth; // restart animation
+        diagram.classList.add('view-fade');
+        diagram.innerHTML = carSvg(currentAnalysis.damageZones, newView);
+        document.querySelectorAll('#car-diagram .car-zone').forEach(el => {
+          el.addEventListener('click', () => zoneClick(el.dataset.zone));
+          if (activeZone && el.dataset.zone === activeZone) el.classList.add('active');
+        });
+      }
+      // Update associated photo
+      updateAssociatedPhoto();
+    }
+
+    function updateAssociatedPhoto() {
+      const container = document.getElementById('view-photo-container');
+      if (!container) return;
+      const photo = getPhotoForView(currentView);
+      if (photo) {
+        const photoMarkers = (currentAnalysis.photoAnalyses || []).find(pa => pa.viewDetected === photo.viewLabel)?.damageZones || [];
+        container.innerHTML = `
+          <div class="relative">
+            <img src="${photo.dataUrl}" alt="${photo.viewLabel}" class="w-full rounded-2xl border border-stone-200" />
+            ${photoMarkers.filter(z => z.severity !== 'none' && z.photoX != null).map((z, i) => {
+              const color = { minor:'#fde047', moderate:'#fb923c', severe:'#ef4444' }[z.severity] || '#fbbf24';
+              return `
+                <div class="absolute photo-marker" style="left: ${z.photoX}%; top: ${z.photoY}%; cursor:pointer; animation-delay: ${0.1 + i * 0.1}s;" data-zone="${z.zone}">
+                  <div class="relative">
+                    <div class="absolute inset-0 rounded-full animate-ping" style="background:${color}; opacity:0.4"></div>
+                    <div class="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg" style="background:${color}">${i + 1}</div>
+                  </div>
+                </div>`;
+            }).join('')}
+            <div class="absolute top-3 left-3 bg-stone-900/80 backdrop-blur text-white text-[10px] tracking-wider font-bold px-2 py-0.5 rounded-full">
+              ${(VIEW_LABELS.find(v => v.key === photo.viewLabel)?.labelFR || photo.viewLabel).toUpperCase()}
+            </div>
+          </div>`;
+        container.querySelectorAll('.photo-marker').forEach(el => {
+          el.addEventListener('click', () => zoneClick(el.dataset.zone));
+        });
+      } else {
+        container.innerHTML = `
+          <div class="bg-stone-100 rounded-2xl border-2 border-dashed border-stone-300 p-8 text-center">
+            <svg class="w-10 h-10 mx-auto text-stone-400 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <div class="text-sm text-stone-500">Pas de photo pour cette vue</div>
+            <div class="text-xs text-stone-400 mt-1">Téléchargez une photo de cette angle pour voir l'annotation</div>
+          </div>`;
+      }
+    }
+
+    // ================== ZONE CLICK ==================
+    function zoneClick(zone) {
+      activeZone = activeZone === zone ? null : zone;
+      document.querySelectorAll('.car-zone').forEach(el => el.classList.remove('active'));
+      if (activeZone) document.querySelectorAll(`.car-zone[data-zone="${activeZone}"]`).forEach(el => el.classList.add('active'));
+
+      // Filter parts cards (within active tab)
+      filterPartsByZone();
+
+      const zoneInfo = document.getElementById('zone-info');
+      const zoneInfoContent = document.getElementById('zone-info-content');
+      if (!zoneInfo) return;
+      if (activeZone) {
+        const zoneData = (currentAnalysis.damageZones || []).find(z => z.zone === activeZone);
+        const zoneParts = (currentAnalysis.parts || []).filter(p => p.zone === activeZone);
+        zoneInfo.classList.remove('hidden');
+        zoneInfoContent.innerHTML = `
+          <div class="flex items-baseline justify-between mb-3">
+            <div class="font-serif text-lg text-stone-900">${zoneNamesFR()[activeZone] || activeZone}</div>
+            <button id="clear-zone" class="text-xs text-stone-500 hover:text-stone-900">✕ Fermer</button>
+          </div>
+          ${zoneData ? `<div class="text-sm text-stone-600 mb-3">${escapeHtml(zoneData.descriptionFR || '')} <span class="text-xs ml-2 text-stone-500">(${severityLabelFR(zoneData.severity)})</span></div>` : ''}
+          <div class="text-xs text-stone-500">${zoneParts.length} pièce${zoneParts.length>1?'s':''} dans cette zone</div>
+        `;
+        document.getElementById('clear-zone')?.addEventListener('click', () => { zoneClick(activeZone); });
+      } else {
+        zoneInfo.classList.add('hidden');
+      }
+    }
+
+    function filterPartsByZone() {
+      const cards = document.querySelectorAll('.part-card');
+      cards.forEach(c => {
+        const matchesZone = !activeZone || c.dataset.zone === activeZone;
+        const matchesTab = activePartsTab === 'all'
+          || (activePartsTab === 'salvageable' && c.dataset.salvageable === 'true')
+          || (activePartsTab === 'damaged' && c.dataset.salvageable === 'false');
+        c.style.display = (matchesZone && matchesTab) ? '' : 'none';
+      });
+      // Update tab counts visually
+      updatePartsTabCounts();
+    }
+
+    function updatePartsTabCounts() {
+      if (!currentAnalysis) return;
+      const allParts = currentAnalysis.parts || [];
+      const inZone = activeZone ? allParts.filter(p => p.zone === activeZone) : allParts;
+      const all = inZone.length;
+      const salv = inZone.filter(p => p.salvageable).length;
+      const dmg = all - salv;
+      const setBadge = (id, n) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = n;
       };
+      setBadge('count-all', all);
+      setBadge('count-salvageable', salv);
+      setBadge('count-damaged', dmg);
     }
 
-    function severityLabelFR(s) {
-      return { none: 'Aucun', minor: 'Léger', moderate: 'Modéré', severe: 'Important' }[s] || s;
+    function switchPartsTab(tab) {
+      activePartsTab = tab;
+      document.querySelectorAll('.parts-tab').forEach(t => {
+        t.classList.remove('active', 'bg-stone-900', 'text-white');
+        t.classList.add('text-stone-600');
+      });
+      const target = document.querySelector(`.parts-tab[data-tab="${tab}"]`);
+      if (target) {
+        target.classList.add('active', 'bg-stone-900', 'text-white');
+        target.classList.remove('text-stone-600');
+      }
+      filterPartsByZone();
     }
 
+    // ================== RENDER RESULTS ==================
     function renderResults(a) {
-      previewSection.classList.add('hidden');
       resultsSection.classList.remove('hidden');
-
       const v = a.vehicleInfo || {};
       const e = a.earnings || {};
       const oc = a.overallCondition || {};
       const stats = a.stats || { totalDetected: 0, salvageableCount: 0, damagedCount: 0 };
+      const allParts = a.parts || [];
 
-      const totalParts = (a.parts || []).length;
-      const sevOrder = { severe: 0, moderate: 1, minor: 2, none: 3 };
-      const sortedZones = [...(a.damageZones || [])].sort((x, y) => sevOrder[x.severity] - sevOrder[y.severity]);
-      const photoMarkers = (a.damageZones || []).filter(z => z.severity !== 'none' && z.photoX != null && z.photoY != null);
-
-      const salvageableParts = (a.parts || []).filter(p => p.salvageable);
-      const damagedParts = (a.parts || []).filter(p => !p.salvageable);
+      // Determine starting view: prefer one matching first uploaded photo
+      const firstPhoto = photos[0];
+      currentView = firstPhoto ? VIEW_TO_DIAGRAM[firstPhoto.viewLabel] || 'top' : 'top';
+      activePartsTab = 'all';
+      activeZone = null;
 
       resultsSection.innerHTML = `
         <!-- Top header -->
         <div class="flex items-end justify-between flex-wrap gap-4 pb-6 border-b border-stone-200">
           <div>
-            <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-3">Rapport casse auto</div>
+            <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-3">Rapport casse auto · ${a.photoCount || 1} photo${(a.photoCount || 1) > 1 ? 's' : ''} analysée${(a.photoCount || 1) > 1 ? 's' : ''}</div>
             <h2 class="font-serif text-3xl md:text-5xl font-light text-stone-900 leading-tight">
               Jetour ${escapeHtml(v.model || 'X70')}
             </h2>
@@ -1008,7 +1044,7 @@
           </button>
         </div>
 
-        <!-- HERO METRIC: EARNING POTENTIAL -->
+        <!-- HERO METRIC -->
         <div class="bg-gradient-to-br from-stone-900 to-stone-800 rounded-3xl p-8 md:p-10 text-stone-50 relative overflow-hidden">
           <div class="absolute -top-20 -right-20 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl"></div>
           <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl"></div>
@@ -1025,7 +1061,7 @@
             </div>
             <div class="md:border-l md:border-stone-700 md:pl-8 space-y-4">
               <div>
-                <div class="text-xs tracking-[0.15em] uppercase text-stone-400 mb-1">Vente en bloc (épave)</div>
+                <div class="text-xs tracking-[0.15em] uppercase text-stone-400 mb-1">Vente en bloc</div>
                 <div class="font-serif text-2xl">${fmt(e.wholeCarValueTND)}</div>
               </div>
               <div>
@@ -1041,114 +1077,109 @@
           ${oc.summaryFR ? `<div class="relative mt-6 pt-6 border-t border-stone-700 text-stone-300 text-sm leading-relaxed">${escapeHtml(oc.summaryFR)}</div>` : ''}
         </div>
 
-        <!-- 2D DIAGRAM + PHOTO -->
+        <!-- 3D ROTATION VIEW + PHOTO -->
         <div class="grid lg:grid-cols-2 gap-8">
           <div class="bg-white rounded-3xl border border-stone-200 p-6 md:p-8">
             <div class="flex items-baseline justify-between mb-4 flex-wrap gap-3">
               <div>
-                <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-2">Cartographie technique</div>
-                <h3 class="font-serif text-2xl text-stone-900">Vue 3D simulée</h3>
+                <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-2">Vue 3D simulée</div>
+                <h3 class="font-serif text-2xl text-stone-900">Faites tourner le véhicule</h3>
               </div>
-              <div class="flex gap-2 text-[10px]">
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>Intact</span>
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-300"></span>Léger</span>
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span>Modéré</span>
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>Important</span>
-              </div>
+              <button id="autorotate-btn" class="bg-stone-100 text-stone-700 hover:bg-stone-200 transition-colors text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1">
+                <span class="btn-label">▶ Auto</span>
+              </button>
             </div>
+
+            <div class="flex gap-2 text-[10px] mb-4 justify-center">
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>Intact</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-300"></span>Léger</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span>Modéré</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>Important</span>
+            </div>
+
+            <!-- View tabs -->
             <div class="flex gap-1 p-1 bg-stone-100 rounded-full mb-6 max-w-md mx-auto">
-              <button class="view-tab active flex-1 py-2 px-3 rounded-full text-xs font-medium transition-all bg-white text-stone-900 shadow-sm" data-view="top">Dessus</button>
+              <button class="view-tab flex-1 py-2 px-3 rounded-full text-xs font-medium transition-all text-stone-600 hover:text-stone-900" data-view="top">Dessus</button>
               <button class="view-tab flex-1 py-2 px-3 rounded-full text-xs font-medium transition-all text-stone-600 hover:text-stone-900" data-view="front">Avant</button>
               <button class="view-tab flex-1 py-2 px-3 rounded-full text-xs font-medium transition-all text-stone-600 hover:text-stone-900" data-view="side">Côté</button>
               <button class="view-tab flex-1 py-2 px-3 rounded-full text-xs font-medium transition-all text-stone-600 hover:text-stone-900" data-view="rear">Arrière</button>
             </div>
-            <div id="car-diagram" class="max-w-md mx-auto">${carSvg(a.damageZones, 'top')}</div>
-            <div class="text-center text-xs text-stone-500 mt-4">Cliquez sur une zone pour filtrer les pièces · Changez d'angle avec les onglets</div>
+
+            <!-- Diagram with rotation stage -->
+            <div class="rotation-stage drag-grab" id="rotation-stage">
+              <div id="car-diagram" class="max-w-md mx-auto">${carSvg(a.damageZones, currentView)}</div>
+            </div>
+
+            <div class="text-center text-xs text-stone-500 mt-4">
+              💡 Cliquez sur une zone · Glissez pour tourner · Bouton Auto pour rotation automatique
+            </div>
             <div id="zone-info" class="mt-6 hidden bg-stone-50 rounded-2xl p-5 border border-stone-200">
               <div id="zone-info-content"></div>
             </div>
           </div>
 
+          <!-- Photo with markers (synchronized with current view) -->
           <div class="space-y-6">
             <div class="bg-white rounded-3xl border border-stone-200 p-6">
               <div class="flex items-baseline justify-between mb-4">
-                <div class="text-xs tracking-[0.15em] uppercase text-stone-500">Photo annotée</div>
-                <div class="text-[10px] text-stone-500">${photoMarkers.length} zones marquées</div>
+                <div class="text-xs tracking-[0.15em] uppercase text-stone-500">Photo correspondante</div>
+                <div class="text-[10px] text-stone-500">${a.photoCount || 1}/${VIEW_LABELS.length} vues</div>
               </div>
-              <div class="relative inline-block w-full">
-                <img src="${imageDataUrl}" alt="Véhicule" class="w-full rounded-2xl border border-stone-200" />
-                ${photoMarkers.map((z, i) => {
-                  const color = { minor:'#fde047', moderate:'#fb923c', severe:'#ef4444' }[z.severity] || '#fbbf24';
-                  return `
-                    <div class="absolute photo-marker" style="left: ${z.photoX}%; top: ${z.photoY}%; cursor:pointer; animation-delay: ${0.3 + i * 0.15}s;" data-zone="${z.zone}">
-                      <div class="relative">
-                        <div class="absolute inset-0 rounded-full animate-ping" style="background:${color}; opacity:0.4"></div>
-                        <div class="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg" style="background:${color}">${i + 1}</div>
-                      </div>
-                    </div>`;
-                }).join('')}
-              </div>
+              <div id="view-photo-container"></div>
             </div>
 
             <div class="bg-white rounded-3xl border border-stone-200 p-6">
-              <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Zones endommagées détectées</div>
-              <div class="space-y-2">
-                ${sortedZones.filter(z => z.severity !== 'none').map((z, i) => {
-                  const sevColor = { minor:'bg-yellow-300', moderate:'bg-orange-400', severe:'bg-red-500' }[z.severity] || 'bg-stone-300';
-                  return `
-                    <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer zone-list-item" data-zone="${z.zone}">
-                      <span class="w-6 h-6 rounded-full ${sevColor} text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${i + 1}</span>
-                      <div class="flex-1 min-w-0">
-                        <div class="font-medium text-stone-900 text-sm">${zoneNamesFR()[z.zone] || z.zone}</div>
-                        <div class="text-xs text-stone-500 mt-0.5">${escapeHtml(z.descriptionFR || '')}</div>
-                      </div>
-                      <span class="text-[10px] tracking-wider uppercase text-stone-500">${severityLabelFR(z.severity)}</span>
-                    </div>`;
-                }).join('') || '<div class="text-sm text-stone-500 text-center py-4">Aucun dégât détecté</div>'}
+              <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-4">Toutes les photos analysées</div>
+              <div class="grid grid-cols-2 gap-2">
+                ${photos.map(p => `
+                  <div class="relative group cursor-pointer photo-quickview" data-view="${p.viewLabel}">
+                    <img src="${p.dataUrl}" class="w-full h-20 object-cover rounded-lg border border-stone-200 group-hover:border-stone-400 transition-colors" />
+                    <div class="absolute bottom-1 left-1 bg-stone-900/80 text-white text-[9px] tracking-wider font-bold px-1.5 py-0.5 rounded">
+                      ${(VIEW_LABELS.find(v => v.key === p.viewLabel)?.labelFR || p.viewLabel).toUpperCase()}
+                    </div>
+                  </div>
+                `).join('')}
+                ${photos.length < 4 ? `
+                  <div class="bg-stone-50 border border-dashed border-stone-200 rounded-lg h-20 flex items-center justify-center text-[10px] text-stone-400 text-center px-2">
+                    ${4 - photos.length} vue${4 - photos.length > 1 ? 's' : ''} non fournie${4 - photos.length > 1 ? 's' : ''}
+                  </div>` : ''}
               </div>
             </div>
           </div>
         </div>
 
-        <!-- SALVAGEABLE PARTS -->
-        ${salvageableParts.length > 0 ? `
+        <!-- PARTS WITH TABS -->
         <div>
           <div class="flex items-baseline justify-between flex-wrap gap-3 mb-6">
             <div>
-              <div class="text-xs tracking-[0.15em] uppercase text-emerald-700 mb-2">✓ À revendre</div>
-              <h3 class="font-serif text-3xl md:text-4xl font-light text-stone-900">${salvageableParts.length} pièces récupérables</h3>
+              <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-2">Inventaire détaillé</div>
+              <h3 class="font-serif text-3xl md:text-4xl font-light text-stone-900">${stats.totalDetected} pièces analysées</h3>
               <div class="text-sm text-stone-500 mt-1">Avec références OEM officielles Jetour</div>
             </div>
-            <div class="text-right">
-              <div class="text-xs tracking-[0.15em] uppercase text-stone-500 mb-1">Total potentiel</div>
-              <div class="font-serif text-2xl text-emerald-700">${fmt(e.totalMinTND)} – ${fmt(e.totalMaxTND)}</div>
+            <div class="flex gap-1 p-1 bg-stone-100 rounded-full">
+              <button class="parts-tab active bg-stone-900 text-white px-4 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-2" data-tab="all">
+                Toutes <span id="count-all" class="bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">${stats.totalDetected}</span>
+              </button>
+              <button class="parts-tab text-stone-600 hover:text-stone-900 px-4 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-2" data-tab="salvageable">
+                ✓ Récupérables <span id="count-salvageable" class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full text-[10px]">${stats.salvageableCount}</span>
+              </button>
+              <button class="parts-tab text-stone-600 hover:text-stone-900 px-4 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-2" data-tab="damaged">
+                ✕ Endommagées <span id="count-damaged" class="bg-red-100 text-red-800 px-1.5 py-0.5 rounded-full text-[10px]">${stats.damagedCount}</span>
+              </button>
             </div>
           </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            ${salvageableParts.map((p, i) => renderPartCard(p, i, true)).join('')}
-          </div>
-        </div>` : ''}
 
-        <!-- DAMAGED PARTS -->
-        ${damagedParts.length > 0 ? `
-        <div>
-          <div class="flex items-baseline justify-between flex-wrap gap-3 mb-6">
-            <div>
-              <div class="text-xs tracking-[0.15em] uppercase text-red-700 mb-2">✕ Non récupérables</div>
-              <h3 class="font-serif text-3xl md:text-4xl font-light text-stone-900">${damagedParts.length} pièces endommagées</h3>
-              <div class="text-sm text-stone-500 mt-1">Trop abîmées pour la revente — à recycler</div>
-            </div>
+          <div id="parts-grid" class="grid md:grid-cols-2 gap-4">
+            ${allParts.map((p, i) => renderPartCard(p, i)).join('')}
           </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            ${damagedParts.map((p, i) => renderPartCard(p, i, false)).join('')}
-          </div>
-        </div>` : ''}
+          ${allParts.length === 0 ? '<div class="text-center text-stone-500 py-12">Aucune pièce détectée</div>' : ''}
+        </div>
 
         <!-- Action bar -->
         <div class="bg-stone-900 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="text-stone-50">
             <div class="font-serif text-xl">Prêt à publier ${stats.salvageableCount} pièces ?</div>
-            <div class="text-sm text-stone-400 mt-1">Toutes les pièces avec leurs références OEM seront listées sur la marketplace</div>
+            <div class="text-sm text-stone-400 mt-1">Toutes les pièces avec leurs références OEM seront listées</div>
           </div>
           <div class="flex gap-3 w-full md:w-auto">
             <button class="flex-1 md:flex-none px-6 py-3 border border-stone-700 text-stone-50 rounded-full text-sm hover:bg-stone-800 transition-colors">Exporter PDF</button>
@@ -1162,15 +1193,22 @@
         <!-- Disclaimer -->
         <div class="flex items-start gap-3 pt-6 text-xs text-stone-500 leading-relaxed">
           <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <p><span class="font-medium text-stone-700">Note.</span> Références OEM extraites du catalogue officiel Jetour Spare Parts. Les prix d'occasion sont des estimations basées sur le marché tunisien et peuvent varier selon l'état exact, la saison et la demande locale. Toujours vérifier l'état physique avant publication.</p>
+          <p><span class="font-medium text-stone-700">Note.</span> Références OEM extraites du catalogue officiel Jetour. Prix d'occasion estimés sur le marché tunisien et susceptibles de varier selon l'état exact, la saison et la demande locale.</p>
         </div>
       `;
 
-      attachResultsHandlers(a);
+      attachResultsHandlers();
+      updateAssociatedPhoto();
+      // Activate the right view tab
+      const viewTab = document.querySelector(`.view-tab[data-view="${currentView}"]`);
+      if (viewTab) {
+        viewTab.classList.add('active', 'bg-white', 'text-stone-900', 'shadow-sm');
+        viewTab.classList.remove('text-stone-600');
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function renderPartCard(p, i, isSalvageable) {
+    function renderPartCard(p, i) {
       const conditionStyles = {
         'Neuf': 'bg-emerald-50 text-emerald-800 border-emerald-200',
         'Bon': 'bg-emerald-50 text-emerald-800 border-emerald-200',
@@ -1179,20 +1217,16 @@
         'Pour pièces': 'bg-red-50 text-red-800 border-red-200',
       };
       const condClass = conditionStyles[p.condition] || 'bg-stone-50 text-stone-700 border-stone-200';
-
+      const isSalvageable = p.salvageable;
       const cardBorder = isSalvageable
         ? 'border-emerald-200 hover:border-emerald-400'
         : 'border-stone-200 opacity-70';
 
-      const usedSavings = p.newPriceTND && p.usedPriceMaxTND
-        ? Math.round(((p.newPriceTND - p.usedPriceMaxTND) / p.newPriceTND) * 100)
-        : 0;
-
       return `
-        <div class="part-card bg-white rounded-2xl border ${cardBorder} p-5 hover:shadow-md transition-all" data-zone="${p.zone}">
+        <div class="part-card bg-white rounded-2xl border ${cardBorder} p-5 hover:shadow-md transition-all" data-zone="${p.zone}" data-salvageable="${isSalvageable}">
           <div class="flex items-start justify-between mb-3 gap-3">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1.5">
+              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span class="text-[9px] tracking-[0.15em] uppercase text-stone-400">${escapeHtml(p.category || '')}</span>
                 <span class="text-[9px] text-stone-400">·</span>
                 <span class="text-[9px] tracking-wide font-mono text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">${escapeHtml(p.oemReference)}</span>
@@ -1211,12 +1245,7 @@
               <div class="font-serif text-2xl text-emerald-700">${fmt(p.usedPriceMinTND)}</div>
               <div class="text-stone-400 text-sm">– ${fmt(p.usedPriceMaxTND)}</div>
             </div>
-            ${p.newPriceTND ? `
-              <div class="flex items-baseline gap-2 mt-1.5 text-xs">
-                <span class="text-stone-500">Prix neuf:</span>
-                <span class="text-stone-400">${fmt(p.newPriceTND)}</span>
-                ${usedSavings > 0 ? `<span class="text-stone-500">(soit ${100 - usedSavings}% du neuf)</span>` : ''}
-              </div>` : ''}
+            ${p.newPriceTND ? `<div class="flex items-baseline gap-2 mt-1.5 text-xs"><span class="text-stone-500">Prix neuf:</span><span class="text-stone-400">${fmt(p.newPriceTND)}</span></div>` : ''}
           </div>` : `
           <div class="mb-4 pb-4 border-b border-stone-100">
             <div class="text-[10px] tracking-[0.15em] uppercase text-stone-500 mb-1">Prix neuf (référence)</div>
@@ -1235,66 +1264,91 @@
       `;
     }
 
-    function attachResultsHandlers(a) {
+    // ================== HANDLERS ==================
+    function attachResultsHandlers() {
       document.getElementById('reset-btn-results')?.addEventListener('click', reset);
 
-      const zoneClick = (zone) => {
-        activeZone = activeZone === zone ? null : zone;
-        document.querySelectorAll('.car-zone').forEach(el => el.classList.remove('active'));
-        if (activeZone) document.querySelectorAll(`.car-zone[data-zone="${activeZone}"]`).forEach(el => el.classList.add('active'));
-
-        const cards = document.querySelectorAll('.part-card');
-        cards.forEach(c => {
-          if (!activeZone) c.style.display = '';
-          else c.style.display = c.dataset.zone === activeZone ? '' : 'none';
-        });
-
-        const zoneInfo = document.getElementById('zone-info');
-        const zoneInfoContent = document.getElementById('zone-info-content');
-        if (activeZone) {
-          const zoneData = (a.damageZones || []).find(z => z.zone === activeZone);
-          const zoneParts = (a.parts || []).filter(p => p.zone === activeZone);
-          zoneInfo.classList.remove('hidden');
-          zoneInfoContent.innerHTML = `
-            <div class="flex items-baseline justify-between mb-3">
-              <div class="font-serif text-lg text-stone-900">${zoneNamesFR()[activeZone] || activeZone}</div>
-              <button id="clear-zone" class="text-xs text-stone-500 hover:text-stone-900">✕ Fermer</button>
-            </div>
-            ${zoneData ? `<div class="text-sm text-stone-600 mb-3">${escapeHtml(zoneData.descriptionFR || '')} <span class="text-xs ml-2 text-stone-500">(${severityLabelFR(zoneData.severity)})</span></div>` : ''}
-            <div class="text-xs text-stone-500">${zoneParts.length} pièce${zoneParts.length>1?'s':''} concernée${zoneParts.length>1?'s':''}</div>
-          `;
-          document.getElementById('clear-zone')?.addEventListener('click', () => { zoneClick(activeZone); });
-        } else {
-          zoneInfo.classList.add('hidden');
-        }
-      };
-
-      document.querySelectorAll('.car-zone').forEach(el => el.addEventListener('click', () => zoneClick(el.dataset.zone)));
-      document.querySelectorAll('.zone-list-item').forEach(el => el.addEventListener('click', () => zoneClick(el.dataset.zone)));
-      document.querySelectorAll('.photo-marker').forEach(el => el.addEventListener('click', () => zoneClick(el.dataset.zone)));
-
       // View tab switcher
-      let currentView = 'top';
-      const switchView = (newView) => {
-        if (newView === currentView) return;
-        currentView = newView;
-        document.querySelectorAll('.view-tab').forEach(t => {
-          t.classList.remove('active', 'bg-white', 'text-stone-900', 'shadow-sm');
-          t.classList.add('text-stone-600');
-        });
-        const target = document.querySelector(`.view-tab[data-view="${newView}"]`);
-        target?.classList.add('active', 'bg-white', 'text-stone-900', 'shadow-sm');
-        target?.classList.remove('text-stone-600');
-        document.getElementById('car-diagram').innerHTML = carSvg(a.damageZones, newView);
-        document.querySelectorAll('#car-diagram .car-zone').forEach(el => {
-          el.addEventListener('click', () => zoneClick(el.dataset.zone));
-          if (activeZone && el.dataset.zone === activeZone) el.classList.add('active');
-        });
-      };
       document.querySelectorAll('.view-tab').forEach(tab => {
-        tab.addEventListener('click', () => switchView(tab.dataset.view));
+        tab.addEventListener('click', () => {
+          stopAutoRotate();
+          switchDiagramView(tab.dataset.view);
+        });
       });
+
+      // Auto-rotate button
+      document.getElementById('autorotate-btn')?.addEventListener('click', toggleAutoRotate);
+
+      // Parts tabs
+      document.querySelectorAll('.parts-tab').forEach(tab => {
+        tab.addEventListener('click', () => switchPartsTab(tab.dataset.tab));
+      });
+
+      // Zone clicks on diagram
+      document.querySelectorAll('#car-diagram .car-zone').forEach(el => {
+        el.addEventListener('click', () => zoneClick(el.dataset.zone));
+      });
+
+      // Photo quickview thumbnails
+      document.querySelectorAll('.photo-quickview').forEach(el => {
+        el.addEventListener('click', () => {
+          const view = el.dataset.view;
+          // Map photo view to diagram view
+          const dv = VIEW_TO_DIAGRAM[view] || 'top';
+          stopAutoRotate();
+          switchDiagramView(dv);
+        });
+      });
+
+      // Drag-to-rotate on the rotation stage
+      const stage = document.getElementById('rotation-stage');
+      if (stage) {
+        let isDragging = false;
+        let startX = 0;
+        let accumulatedDx = 0;
+        const ROTATE_THRESHOLD = 80; // pixels per view change
+
+        const onPointerDown = (e) => {
+          isDragging = true;
+          startX = e.clientX || e.touches?.[0]?.clientX || 0;
+          accumulatedDx = 0;
+          stopAutoRotate();
+        };
+        const onPointerMove = (e) => {
+          if (!isDragging) return;
+          const x = e.clientX || e.touches?.[0]?.clientX || 0;
+          const dx = x - startX;
+          accumulatedDx += dx;
+          startX = x;
+
+          // Each ROTATE_THRESHOLD pixels = 1 view change
+          while (Math.abs(accumulatedDx) > ROTATE_THRESHOLD) {
+            const idx = DIAGRAM_VIEWS.indexOf(currentView);
+            let nextIdx;
+            if (accumulatedDx > 0) {
+              nextIdx = (idx + 1) % DIAGRAM_VIEWS.length;
+              accumulatedDx -= ROTATE_THRESHOLD;
+            } else {
+              nextIdx = (idx - 1 + DIAGRAM_VIEWS.length) % DIAGRAM_VIEWS.length;
+              accumulatedDx += ROTATE_THRESHOLD;
+            }
+            switchDiagramView(DIAGRAM_VIEWS[nextIdx]);
+          }
+        };
+        const onPointerUp = () => { isDragging = false; };
+
+        stage.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('mousemove', onPointerMove);
+        document.addEventListener('mouseup', onPointerUp);
+        stage.addEventListener('touchstart', onPointerDown, { passive: true });
+        document.addEventListener('touchmove', onPointerMove, { passive: true });
+        document.addEventListener('touchend', onPointerUp);
+      }
     }
+
+    // ================== INIT ==================
+    renderPhotoSlots();
+    updateUI();
   </script>
 </body>
 </html>
