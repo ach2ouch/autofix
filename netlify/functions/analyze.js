@@ -1894,19 +1894,51 @@ CONTEXTE IMPORTANT: Le propriétaire d'une casse auto a récupéré cette Merced
 LOGIQUE CRITIQUE À RESPECTER:
 - Si la voiture a un choc à l'AVANT seulement → les pièces ARRIÈRE et CÔTÉS sont INTACTES (salvageable: true, condition: "Bon")
 - Si la voiture a un choc à GAUCHE seulement → les pièces de DROITE sont INTACTES (salvageable: true)
+- Si la voiture a des chocs MULTIPLES (par ex. avant ET arrière, ou avant ET côté) → les pièces de CHAQUE zone impactée sont endommagées (salvageable: false), et les pièces des zones intactes restent salvageable: true
 - Si une zone n'a aucun dégât visible → ses pièces sont salvageable: true avec condition "Bon"
 - Seules les pièces DIRECTEMENT dans la zone d'impact sont endommagées (salvageable: false)
 - Pour un petit choc, attends-toi à 70-90% de pièces salvageable
-- Pour un gros choc, attends-toi à 40-60% de pièces salvageable
+- Pour un gros choc ou plusieurs zones impactées, attends-toi à 40-60% de pièces salvageable
 - Pour total_loss, attends-toi à 20-40% de pièces salvageable
-- IMPORTANT: Inclus TOUJOURS au moins 2-3 pièces hybrides (catégorie "hybride") si la voiture est confirmée hybride — ce sont les pièces les plus précieuses!
+
+RÈGLE ABSOLUE — TOUJOURS INCLURE DES PIÈCES ENDOMMAGÉES:
+Si tu détectes AU MOINS UNE zone endommagée (damageZones a au moins 1 entrée avec severity !== "none"), alors partsAnalysis DOIT contenir AU MINIMUM 2 pièces avec salvageable: false dans cette/ces zone(s).
+Exemple: choc avant → tu DOIS inclure au moins 2 pièces du front_center, front_left ou front_right avec salvageable: false.
+Exemple: choc avant + arrière → tu DOIS inclure au moins 2 pièces endommagées AVANT et 2 pièces endommagées ARRIÈRE.
+Une analyse sans aucune pièce endommagée alors qu'il y a des dégâts visibles est INACCEPTABLE.
+
+EXEMPLE CONCRET — Voiture avec gros choc avant + arrière (comme épave totale):
+{
+  "damageZones": [
+    {"zone":"front_center","severity":"severe","descriptionFR":"capot déchiré, calandre détruite","photoX":50,"photoY":40},
+    {"zone":"front_left","severity":"severe","descriptionFR":"aile gauche enfoncée","photoX":25,"photoY":50},
+    {"zone":"rear_center","severity":"severe","descriptionFR":"pare-chocs arraché","photoX":50,"photoY":60},
+    {"zone":"rear_right","severity":"severe","descriptionFR":"feu arrière droit cassé","photoX":70,"photoY":55}
+  ],
+  "partsAnalysis": [
+    // DAMAGED parts (zones impactées) — OBLIGATOIRE:
+    {"oemReference":"A 205 880 03 47","zone":"rear_center","salvageable":false,"condition":"Endommagé","damageNotesFR":"Pare-chocs arrière arraché"},
+    {"oemReference":"A 205 906 06 01","zone":"front_center","salvageable":false,"condition":"Pour pièces","damageNotesFR":"Phare LED détruit dans le choc avant"},
+    {"oemReference":"A 205 750 24 00","zone":"rear_center","salvageable":false,"condition":"Endommagé","damageNotesFR":"Couvercle de coffre déformé"},
+    // SALVAGEABLE parts (zones intactes) — côtés généralement OK:
+    {"oemReference":"A 205 810 82 00","zone":"left_side","salvageable":true,"condition":"Bon","damageNotesFR":"Rétroviseur gauche intact"},
+    {"oemReference":"A 205 725 01 10","zone":"right_side","salvageable":true,"condition":"Bon","damageNotesFR":"Vitre porte droite intacte"},
+    // ALWAYS include hybrid parts if hybrid car:
+    {"oemReference":"A 000 982 30 21","zone":"front_center","salvageable":true,"condition":"Bon","damageNotesFR":"Chargeur batterie intact, situé loin de la zone impact"}
+  ]
+}
+
+IMPORTANT: Inclus TOUJOURS au moins 2-3 pièces hybrides (catégorie "hybride") si la voiture est confirmée hybride — ce sont les pièces les plus précieuses!
 
 INSTRUCTIONS:
 1. Vérifie que c'est bien une Mercedes Classe C (W205) — sinon retourne {"error":"..."}
-2. Identifie les zones endommagées (avec photoX, photoY 0-100%)
-3. Choisis 8-12 pièces RÉELLES de la base de données ci-dessous: 5-8 doivent être salvageable: true (intactes), 2-4 endommagées (zones d'impact)
+2. Identifie TOUTES les zones endommagées (avec photoX, photoY 0-100%). Regarde chaque photo attentivement: AVANT, ARRIÈRE, CÔTÉS.
+3. Choisis 10-14 pièces RÉELLES de la base de données ci-dessous:
+   - AU MOINS 3-5 pièces avec salvageable: false dans les zones impactées (obligatoire si dégâts détectés)
+   - 5-9 pièces avec salvageable: true dans les zones intactes
 4. Pour chaque pièce, utilise UNIQUEMENT les références OEM listées (commencent par "A ")
 5. Distribue les pièces sur DIVERSES zones (pas toutes au même endroit)
+6. AVANT de soumettre: relis ta liste de damageZones, puis vérifie que partsAnalysis contient bien des pièces endommagées pour CHAQUE zone identifiée comme touchée.
 
 Réponds UNIQUEMENT en JSON valide (commence {, finit }, pas de markdown).
 
@@ -2041,16 +2073,20 @@ Pas une Mercedes Classe C? {"error":"Cette voiture n'est pas une Mercedes Classe
     }
 
     // Enrich with database
+    let droppedRefs = []; // refs returned by AI but not in our DB
     const enrichedParts = (parsed.partsAnalysis || [])
       .map(p => {
         const dbPart = MERCEDES_W205_PARTS_DB[p.oemReference];
-        if (!dbPart) return null;
+        if (!dbPart) {
+          droppedRefs.push(p.oemReference);
+          return null;
+        }
         return {
           oemReference: p.oemReference,
           nameFR: dbPart.name,
           category: dbPart.category,
           zone: dbPart.zone,
-          salvageable: p.salvageable && dbPart.usedMaxTND > 0,
+          salvageable: p.salvageable === true,
           condition: p.condition,
           damageNotesFR: p.damageNotesFR || '',
           newPriceTND: dbPart.newPriceTND,
@@ -2059,6 +2095,25 @@ Pas une Mercedes Classe C? {"error":"Cette voiture n'est pas une Mercedes Classe
         };
       })
       .filter(Boolean);
+    
+    // Diagnostic logging
+    const aiPartsCount = (parsed.partsAnalysis || []).length;
+    const aiDamagedCount = (parsed.partsAnalysis || []).filter(p => p.salvageable === false).length;
+    const dbMatchedCount = enrichedParts.length;
+    const dbDamagedCount = enrichedParts.filter(p => !p.salvageable).length;
+    const damageZonesCount = (parsed.damageZones || []).filter(z => z.severity !== 'none').length;
+    
+    console.log('=== ANALYSIS DIAGNOSTICS ===');
+    console.log(`Damage zones detected: ${damageZonesCount}`);
+    console.log(`AI returned parts: ${aiPartsCount} (${aiDamagedCount} damaged)`);
+    console.log(`After DB match: ${dbMatchedCount} (${dbDamagedCount} damaged)`);
+    if (droppedRefs.length > 0) {
+      console.log(`⚠️  Dropped refs (not in DB): ${droppedRefs.slice(0, 5).join(', ')}${droppedRefs.length > 5 ? '...' : ''}`);
+    }
+    if (damageZonesCount > 0 && dbDamagedCount === 0) {
+      console.log(`🚨 BUG: ${damageZonesCount} damage zones detected but 0 damaged parts in final output!`);
+      console.log(`AI partsAnalysis was:`, JSON.stringify(parsed.partsAnalysis, null, 2));
+    }
 
     const salvageable = enrichedParts.filter(p => p.salvageable);
     const totalMin = salvageable.reduce((sum, p) => sum + (p.usedPriceMinTND || 0), 0);
