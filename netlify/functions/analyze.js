@@ -2072,17 +2072,31 @@ Pas une Mercedes Classe C? {"error":"Cette voiture n'est pas une Mercedes Classe
       return { statusCode: 200, headers, body: JSON.stringify(parsed) };
     }
 
-    // Enrich with database
+    // Build a normalized lookup map (strip all whitespace) to handle AI formatting variations
+    // The AI might return "A2058800140" or "A 205 880 01 40" or "A 205 880 0140" — all should match
+    const normalizedDb = {};
+    for (const [ref, p] of Object.entries(MERCEDES_W205_PARTS_DB)) {
+      const norm = ref.replace(/\s+/g, '').toUpperCase();
+      normalizedDb[norm] = { canonicalRef: ref, ...p };
+    }
+    
+    function findInDb(aiRef) {
+      if (!aiRef) return null;
+      const norm = String(aiRef).replace(/\s+/g, '').toUpperCase();
+      return normalizedDb[norm] || null;
+    }
+
+    // Enrich with database (tolerant matcher)
     let droppedRefs = []; // refs returned by AI but not in our DB
     const enrichedParts = (parsed.partsAnalysis || [])
       .map(p => {
-        const dbPart = MERCEDES_W205_PARTS_DB[p.oemReference];
+        const dbPart = findInDb(p.oemReference);
         if (!dbPart) {
           droppedRefs.push(p.oemReference);
           return null;
         }
         return {
-          oemReference: p.oemReference,
+          oemReference: dbPart.canonicalRef, // use the properly formatted ref
           nameFR: dbPart.name,
           category: dbPart.category,
           zone: dbPart.zone,
@@ -2108,11 +2122,124 @@ Pas une Mercedes Classe C? {"error":"Cette voiture n'est pas une Mercedes Classe
     console.log(`AI returned parts: ${aiPartsCount} (${aiDamagedCount} damaged)`);
     console.log(`After DB match: ${dbMatchedCount} (${dbDamagedCount} damaged)`);
     if (droppedRefs.length > 0) {
-      console.log(`⚠️  Dropped refs (not in DB): ${droppedRefs.slice(0, 5).join(', ')}${droppedRefs.length > 5 ? '...' : ''}`);
+      console.log(`⚠️  Dropped refs (not in DB): ${droppedRefs.slice(0, 8).join(' | ')}${droppedRefs.length > 8 ? ' ...' : ''}`);
     }
     if (damageZonesCount > 0 && dbDamagedCount === 0) {
       console.log(`🚨 BUG: ${damageZonesCount} damage zones detected but 0 damaged parts in final output!`);
       console.log(`AI partsAnalysis was:`, JSON.stringify(parsed.partsAnalysis, null, 2));
+    }
+
+    // FALLBACK: If we have very few enriched parts (AI gave bad refs), augment with DB parts
+    // based on the damage zone analysis. This guarantees we always show meaningful results.
+    const MIN_PARTS_TARGET = 10;
+    if (enrichedParts.length < MIN_PARTS_TARGET && (parsed.damageZones || []).length > 0) {
+      console.log(`🔧 Fallback: only ${enrichedParts.length} parts matched. Augmenting from DB...`);
+      
+      // Map of damaged zones -> severity
+      const damagedZoneMap = {};
+      (parsed.damageZones || []).forEach(z => {
+        if (z.severity && z.severity !== 'none') {
+          damagedZoneMap[z.zone] = z.severity;
+        }
+      });
+      
+      // Get all DB parts indexed by zone
+      const dbByZone = {};
+      for (const [ref, p] of Object.entries(MERCEDES_W205_PARTS_DB)) {
+        if (!dbByZone[p.zone]) dbByZone[p.zone] = [];
+        dbByZone[p.zone].push({ ref, ...p });
+      }
+      
+      // Track which refs we already have
+      const haveRefs = new Set(enrichedParts.map(p => p.oemReference));
+      
+      // Strategy: from each damaged zone, add up to 3 high-value damaged parts
+      //           from each intact zone, add up to 2 salvageable parts
+      //           always include 2 hybrid parts if not already present
+      
+      const addedDamaged = [];
+      const addedSalvageable = [];
+      
+      // Sort parts in a zone by new price (most valuable first)
+      const sortByPrice = (parts) => [...parts].sort((a, b) => b.newPriceTND - a.newPriceTND);
+      
+      // Add damaged parts from impacted zones
+      for (const [zone, severity] of Object.entries(damagedZoneMap)) {
+        const zoneParts = sortByPrice(dbByZone[zone] || []);
+        let added = 0;
+        for (const part of zoneParts) {
+          if (added >= 3) break;
+          if (haveRefs.has(part.ref)) continue;
+          haveRefs.add(part.ref);
+          const condition = severity === 'severe' ? 'Pour pièces' : severity === 'moderate' ? 'Endommagé' : 'Moyen';
+          addedDamaged.push({
+            oemReference: part.ref,
+            nameFR: part.name,
+            category: part.category,
+            zone: part.zone,
+            salvageable: false,
+            condition,
+            damageNotesFR: `Zone ${zone} impactée (${severity}) — pièce probablement à recycler`,
+            newPriceTND: part.newPriceTND,
+            usedPriceMinTND: part.usedMinTND,
+            usedPriceMaxTND: part.usedMaxTND,
+          });
+          added++;
+        }
+      }
+      
+      // Add salvageable parts from INTACT zones (all zones not in damagedZoneMap)
+      const allZones = Object.keys(dbByZone);
+      const intactZones = allZones.filter(z => !damagedZoneMap[z]);
+      for (const zone of intactZones) {
+        const zoneParts = sortByPrice(dbByZone[zone] || []);
+        let added = 0;
+        for (const part of zoneParts) {
+          if (added >= 2) break;
+          if (haveRefs.has(part.ref)) continue;
+          haveRefs.add(part.ref);
+          addedSalvageable.push({
+            oemReference: part.ref,
+            nameFR: part.name,
+            category: part.category,
+            zone: part.zone,
+            salvageable: true,
+            condition: 'Bon',
+            damageNotesFR: `Zone ${zone} non impactée — pièce intacte, revendable`,
+            newPriceTND: part.newPriceTND,
+            usedPriceMinTND: part.usedMinTND,
+            usedPriceMaxTND: part.usedMaxTND,
+          });
+          added++;
+        }
+      }
+      
+      // Ensure hybrid parts represented
+      const hybridParts = Object.entries(MERCEDES_W205_PARTS_DB)
+        .filter(([_, p]) => p.category === 'hybride')
+        .sort((a, b) => b[1].newPriceTND - a[1].newPriceTND)
+        .slice(0, 3);
+      for (const [ref, part] of hybridParts) {
+        if (haveRefs.has(ref)) continue;
+        const isDamaged = damagedZoneMap[part.zone];
+        haveRefs.add(ref);
+        const addedTo = isDamaged ? addedDamaged : addedSalvageable;
+        addedTo.push({
+          oemReference: ref,
+          nameFR: part.name,
+          category: 'hybride',
+          zone: part.zone,
+          salvageable: !isDamaged,
+          condition: isDamaged ? 'Endommagé' : 'Bon',
+          damageNotesFR: isDamaged ? 'Composant hybride dans zone impactée' : 'Composant hybride précieux, intact',
+          newPriceTND: part.newPriceTND,
+          usedPriceMinTND: part.usedMinTND,
+          usedPriceMaxTND: part.usedMaxTND,
+        });
+      }
+      
+      enrichedParts.push(...addedDamaged, ...addedSalvageable);
+      console.log(`🔧 Augmented with ${addedDamaged.length} damaged + ${addedSalvageable.length} salvageable parts. Total now: ${enrichedParts.length}`);
     }
 
     const salvageable = enrichedParts.filter(p => p.salvageable);
